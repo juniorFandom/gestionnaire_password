@@ -1,0 +1,1904 @@
+{% extends "passwords/base.html" %} 
+{% block title %}Mes Coffres - SecureVault{% endblock %} 
+
+{% block content %}
+<div class="main-content">
+  <div class="container" style="max-width: 1280px; margin: 0 auto; padding: 0 24px">
+    <div class="row">
+      <div class="col-12">
+        <div class="fade-in-up" style="margin-top: 20px">
+          <!-- En-tête stylisé -->
+          <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+              <h1 class="d-flex align-items-center gap-3 mb-2" style="font-size: 32px; font-weight: 700">
+                <div class="logo-orb" style="width: 48px; height: 48px">
+                  <i class="fas fa-lock logo-icon" style="font-size: 20px"></i>
+                </div>
+                <span class="gradient-text">Mes coffres</span>
+              </h1>
+              <p style="color: var(--muted); margin: 0; font-size: 16px">
+                Organisez vos mots de passe par coffres sécurisés
+              </p>
+            </div>
+            <button
+              class="btn hover-lift"
+              data-bs-toggle="modal"
+              data-bs-target="#vaultCreateModal"
+              style="
+                background: var(--gradient-primary);
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 12px;
+                font-weight: 600;
+                font-size: 14px;
+                box-shadow: 0 8px 24px rgba(108, 140, 255, 0.4);
+                transition: all 0.3s ease;
+              "
+              onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 32px rgba(108, 140, 255, 0.6)';"
+              onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 24px rgba(108, 140, 255, 0.4)';"
+            >
+              <i class="fas fa-plus me-2"></i> Nouveau coffre
+            </button>
+          </div>
+
+          <!-- Barre de recherche stylisée -->
+          <div class="mb-4">
+            <div class="position-relative">
+              <i
+                class="fas fa-search position-absolute"
+                style="top: 50%; left: 16px; transform: translateY(-50%); color: var(--muted)"
+              ></i>
+              <input
+                type="text"
+                placeholder="Rechercher un coffre..."
+                id="globalSearch"
+                style="
+                  width: 100%;
+                  padding: 14px 20px 14px 46px;
+                  background: rgba(255, 255, 255, 0.05);
+                  border: 1px solid rgba(255, 255, 255, 0.1);
+                  border-radius: 16px;
+                  color: var(--text);
+                  font-size: 14px;
+                  transition: all 0.3s ease;
+                  backdrop-filter: blur(10px);
+                "
+                onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 3px rgba(108, 140, 255, 0.1)';"
+                onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none';"
+              />
+            </div>
+          </div>
+
+          <!-- Liste des coffres -->
+          {% if vaults %}
+          <div class="row g-4" id="vaultsList">
+            {% for vault in vaults %}
+            <div
+              class="col-md-6 col-lg-4 vault-item hover-lift"
+              data-name="{{ vault.name|lower }}"
+              data-slug="{{ vault.slug }}"
+              style="position: relative"
+            >
+              <div
+                class="position-relative"
+                style="
+                  background: linear-gradient(
+                    135deg,
+                    rgba(18, 25, 53, 0.8),
+                    rgba(15, 21, 48, 0.8)
+                  );
+                  border: 1px solid rgba(255, 255, 255, 0.1);
+                  border-radius: 20px;
+                  padding: 24px;
+                  height: 100%;
+                  backdrop-filter: blur(10px);
+                  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                  overflow: hidden;
+                "
+                onmouseover="this.style.transform='translateY(-8px)'; this.style.borderColor='rgba(108, 140, 255, 0.3)'; this.style.boxShadow='0 20px 60px rgba(0, 0, 0, 0.4)';"
+                onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none';"
+              >
+                <!-- Effet de fond -->
+                <div
+                  class="position-absolute top-0 end-0 w-100 h-100"
+                  style="
+                    background: radial-gradient(circle at 80% 20%, rgba(108, 140, 255, 0.1) 0%, transparent 50%);
+                    z-index: 0;
+                  "
+                ></div>
+
+                <div class="position-relative z-1">
+                  <!-- En-tête de la carte -->
+                  <div class="d-flex align-items-center justify-content-between mb-4">
+                    <div class="d-flex align-items-center gap-3">
+                      <div
+                        style="
+                          width: 56px;
+                          height: 56px;
+                          background: var(--gradient-primary);
+                          border-radius: 16px;
+                          display: flex;
+                          align-items: center;
+                          justify-content: center;
+                          position: relative;
+                          overflow: hidden;
+                          box-shadow: 0 8px 24px rgba(108, 140, 255, 0.4);
+                        "
+                      >
+                        <i class="fas fa-lock" style="color: white; font-size: 22px; z-index: 2"></i>
+                        <div
+                          class="position-absolute w-100 h-100"
+                          style="
+                            background: linear-gradient(
+                              45deg,
+                              transparent 30%,
+                              rgba(255, 255, 255, 0.1) 50%,
+                              transparent 70%
+                            );
+                            animation: shine 3s infinite;
+                          "
+                        ></div>
+                      </div>
+                      <div>
+                        <h4 style="margin: 0; color: white; font-size: 18px; font-weight: 600">
+                          {{ vault.name }}
+                        </h4>
+                        <p style="color: var(--muted); margin: 4px 0 0 0; font-size: 12px">
+                          Dernière modification: Aujourd'hui
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Menu dropdown - POSITIONNÉ EN HAUT À DROITE AVEC POSITION: FIXED -->
+                  <div class="dropdown position-absolute" style="top: 20px; right: 20px; z-index: 20">
+                    <button
+                      class="btn"
+                      type="button"
+                      id="dropdownVault{{ vault.slug }}"
+                      onclick="toggleDropdown(this, '{{ vault.slug }}', '{{ vault.credential_count|default:"0" }}', '{{ vault.id }}', '{{ vault.name }}', event)"
+                      aria-expanded="false"
+                      style="
+                        padding: 8px;
+                        background: rgba(0, 0, 0, 0.5);
+                        border: 1px solid rgba(255, 255, 255, 0.15);
+                        border-radius: 12px;
+                        color: var(--text);
+                        width: 40px;
+                        height: 40px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        backdrop-filter: blur(8px);
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                      "
+                      onmouseover="this.style.background='rgba(108, 140, 255, 0.3)'; this.style.borderColor='rgba(108, 140, 255, 0.5)'; this.style.color='white';"
+                      onmouseout="this.style.background='rgba(0, 0, 0, 0.5)'; this.style.borderColor='rgba(255, 255, 255, 0.15)'; this.style.color='var(--text)';"
+                    >
+                      <i class="fas fa-ellipsis-v" style="font-size: 16px"></i>
+                    </button>
+                  </div>
+
+                  <!-- Footer de la carte -->
+                  <div class="d-flex justify-content-between align-items-center mt-4">
+                    <span
+                      style="
+                        background: rgba(34, 197, 94, 0.2);
+                        color: var(--success);
+                        padding: 6px 12px;
+                        border-radius: 20px;
+                        font-size: 12px;
+                        font-weight: 600;
+                        border: 1px solid rgba(34, 197, 94, 0.3);
+                      "
+                    >
+                      {{ vault.credential_count|default:"0" }} identifiants
+                    </span>
+                    <button
+                      class="btn btn-open-vault"
+                      data-slug="{{ vault.slug }}"
+                      style="
+                        background: rgba(108, 140, 255, 0.2);
+                        color: var(--primary);
+                        border: 1px solid rgba(108, 140, 255, 0.3);
+                        padding: 8px 20px;
+                        border-radius: 12px;
+                        font-weight: 600;
+                        font-size: 14px;
+                        transition: all 0.3s ease;
+                      "
+                      onmouseover="this.style.background='var(--gradient-primary)'; this.style.color='white'; this.style.borderColor='transparent'; this.style.boxShadow='0 8px 24px rgba(108, 140, 255, 0.4)';"
+                      onmouseout="this.style.background='rgba(108, 140, 255, 0.2)'; this.style.color='var(--primary)'; this.style.borderColor='rgba(108, 140, 255, 0.3)'; this.style.boxShadow='none';"
+                    >
+                      <i class="fas fa-eye me-2"></i> Ouvrir
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+
+          <!-- Message si aucun coffre -->
+          {% else %}
+          <div
+            class="text-center py-5"
+            style="
+              background: rgba(255, 255, 255, 0.05);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              border-radius: 20px;
+              backdrop-filter: blur(10px);
+            "
+          >
+            <div
+              class="mb-4"
+              style="
+                width: 80px;
+                height: 80px;
+                background: rgba(108, 140, 255, 0.2);
+                border-radius: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 20px;
+              "
+            >
+              <i class="fas fa-lock" style="font-size: 32px; color: var(--primary)"></i>
+            </div>
+            <h3 class="mb-2" style="color: white">Aucun coffre créé</h3>
+            <p class="mb-4" style="color: var(--muted); max-width: 400px; margin: 0 auto">
+              Créez votre premier coffre pour commencer à sécuriser vos identifiants
+            </p>
+            <button
+              class="btn hover-lift"
+              data-bs-toggle="modal"
+              data-bs-target="#vaultCreateModal"
+              style="
+                background: var(--gradient-primary);
+                color: white;
+                border: none;
+                padding: 12px 32px;
+                border-radius: 12px;
+                font-weight: 600;
+                font-size: 14px;
+                box-shadow: 0 8px 24px rgba(108, 140, 255, 0.4);
+                transition: all 0.3s ease;
+              "
+              onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 32px rgba(108, 140, 255, 0.6)';"
+              onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 24px rgba(108, 140, 255, 0.4)';"
+            >
+              <i class="fas fa-plus me-2"></i> Créer un coffre
+            </button>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS STYLISÉS -->
+
+<!-- MODAL MOT DE PASSE -->
+<div class="modal fade" id="vaultPasswordModal" tabindex="-1">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div
+      class="modal-content"
+      style="
+        background: rgba(18, 25, 53, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(108, 140, 255, 0.2);
+        border-radius: 24px;
+        overflow: hidden;
+      "
+    >
+      <div
+        class="modal-header"
+        style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 24px"
+      >
+        <h5 class="modal-title d-flex align-items-center" style="color: white; font-weight: 600">
+          <div
+            style="
+              width: 36px;
+              height: 36px;
+              background: var(--gradient-primary);
+              border-radius: 12px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin-right: 12px;
+            "
+          >
+            <i class="fas fa-lock" style="color: white; font-size: 16px"></i>
+          </div>
+          Mot de passe du coffre
+        </h5>
+        <button
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          style="filter: brightness(0.8)"
+        ></button>
+      </div>
+      <div class="modal-body" style="padding: 24px">
+        <div class="position-relative mb-3">
+          <i
+            class="fas fa-key position-absolute"
+            style="top: 50%; left: 16px; transform: translateY(-50%); color: var(--muted); z-index: 2"
+          ></i>
+          <input
+            type="password"
+            id="vaultPasswordInput"
+            class="form-control"
+            placeholder="Mot de passe du coffre"
+            autofocus
+            style="
+              padding-left: 46px;
+              background: rgba(255, 255, 255, 0.05);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              border-radius: 16px;
+              color: var(--text);
+              height: 48px;
+              transition: all 0.3s ease;
+            "
+            onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 3px rgba(108, 140, 255, 0.1)';"
+            onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none';"
+          />
+        </div>
+        <div
+          class="text-danger small mt-2 d-none"
+          id="vaultPasswordError"
+          style="
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 8px 12px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          "
+        >
+          <i class="fas fa-exclamation-circle"></i>
+          <span>Mot de passe incorrect</span>
+        </div>
+      </div>
+      <div
+        class="modal-footer"
+        style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding: 24px"
+      >
+        <button
+          class="btn"
+          data-bs-dismiss="modal"
+          style="
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+          "
+          onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.borderColor='rgba(255, 255, 255, 0.2)';"
+          onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'; this.style.borderColor='rgba(255, 255, 255, 0.1)';"
+        >
+          Annuler
+        </button>
+        <button
+          class="btn"
+          id="confirmVaultPassword"
+          style="
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            box-shadow: 0 8px 24px rgba(108, 140, 255, 0.4);
+            transition: all 0.3s ease;
+          "
+          onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 32px rgba(108, 140, 255, 0.6)';"
+          onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 24px rgba(108, 140, 255, 0.4)';"
+        >
+          <i class="fas fa-unlock me-2"></i> Ouvrir
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MODIFICATION DU COFFRE -->
+<div class="modal fade" id="vaultEditModal" tabindex="-1">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div
+      class="modal-content"
+      style="
+        background: rgba(18, 25, 53, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(108, 140, 255, 0.2);
+        border-radius: 24px;
+        overflow: hidden;
+      "
+    >
+      <div
+        class="modal-header"
+        style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 24px"
+      >
+        <h5 class="modal-title d-flex align-items-center" style="color: white; font-weight: 600">
+          <div
+            style="
+              width: 36px;
+              height: 36px;
+              background: var(--gradient-primary);
+              border-radius: 12px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin-right: 12px;
+            "
+          >
+            <i class="fas fa-edit" style="color: white; font-size: 16px"></i>
+          </div>
+          Modifier le coffre
+        </h5>
+        <button
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          style="filter: brightness(0.8)"
+        ></button>
+      </div>
+      <div class="modal-body" style="padding: 24px">
+        <form id="vaultEditForm">
+          <div class="mb-4">
+            <label
+              for="vaultEditName"
+              class="form-label"
+              style="
+                color: var(--muted);
+                font-size: 14px;
+                font-weight: 600;
+                margin-bottom: 8px;
+              "
+            >
+              Nom du coffre
+            </label>
+            <div class="position-relative">
+              <i
+                class="fas fa-lock position-absolute"
+                style="top: 50%; left: 16px; transform: translateY(-50%); color: var(--muted); z-index: 2"
+              ></i>
+              <input
+                type="text"
+                id="vaultEditName"
+                class="form-control"
+                placeholder="Nom du coffre"
+                required
+                style="
+                  padding-left: 46px;
+                  background: rgba(255, 255, 255, 0.05);
+                  border: 1px solid rgba(255, 255, 255, 0.1);
+                  border-radius: 16px;
+                  color: var(--text);
+                  height: 48px;
+                  transition: all 0.3s ease;
+                "
+                onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 3px rgba(108, 140, 255, 0.1)';"
+                onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none';"
+              />
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label
+              for="vaultEditDescription"
+              class="form-label"
+              style="
+                color: var(--muted);
+                font-size: 14px;
+                font-weight: 600;
+                margin-bottom: 8px;
+              "
+            >
+              Description (optionnel)
+            </label>
+            <textarea
+              id="vaultEditDescription"
+              class="form-control"
+              placeholder="Description"
+              rows="3"
+              style="
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 16px;
+                color: var(--text);
+                padding: 12px 16px;
+                transition: all 0.3s ease;
+                resize: none;
+              "
+              onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 3px rgba(108, 140, 255, 0.1)';"
+              onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none';"
+            ></textarea>
+          </div>
+
+          <div class="mb-4">
+            <label
+              for="vaultEditPassword"
+              class="form-label"
+              style="
+                color: var(--muted);
+                font-size: 14px;
+                font-weight: 600;
+                margin-bottom: 8px;
+              "
+            >
+              Mot de passe maître
+            </label>
+            <div class="position-relative">
+              <i
+                class="fas fa-key position-absolute"
+                style="top: 50%; left: 16px; transform: translateY(-50%); color: var(--muted); z-index: 2"
+              ></i>
+              <input
+                type="password"
+                id="vaultEditPassword"
+                class="form-control"
+                placeholder="Mot de passe maître"
+                required
+                style="
+                  padding-left: 46px;
+                  background: rgba(255, 255, 255, 0.05);
+                  border: 1px solid rgba(255, 255, 255, 0.1);
+                  border-radius: 16px;
+                  color: var(--text);
+                  height: 48px;
+                  transition: all 0.3s ease;
+                "
+                onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 3px rgba(108, 140, 255, 0.1)';"
+                onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none';"
+              />
+            </div>
+          </div>
+
+          <div
+            class="text-danger small d-none"
+            id="vaultEditError"
+            style="
+              background: rgba(239, 68, 68, 0.1);
+              border: 1px solid rgba(239, 68, 68, 0.3);
+              padding: 12px 16px;
+              border-radius: 12px;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+            "
+          >
+            <i class="fas fa-exclamation-circle"></i>
+            <span></span>
+          </div>
+        </form>
+      </div>
+      <div
+        class="modal-footer"
+        style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding: 24px"
+      >
+        <button
+          class="btn"
+          data-bs-dismiss="modal"
+          style="
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+          "
+          onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.borderColor='rgba(255, 255, 255, 0.2)';"
+          onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'; this.style.borderColor='rgba(255, 255, 255, 0.1)';"
+        >
+          Annuler
+        </button>
+        <button
+          class="btn"
+          id="confirmVaultEdit"
+          style="
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            box-shadow: 0 8px 24px rgba(108, 140, 255, 0.4);
+            transition: all 0.3s ease;
+          "
+          onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 32px rgba(108, 140, 255, 0.6)';"
+          onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 24px rgba(108, 140, 255, 0.4)';"
+        >
+          <i class="fas fa-save me-2"></i> Enregistrer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CHANGEMENT MOT DE PASSE DU COFFRE -->
+<div class="modal fade" id="vaultChangePasswordModal" tabindex="-1">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div
+      class="modal-content"
+      style="
+        background: rgba(18, 25, 53, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(108, 140, 255, 0.2);
+        border-radius: 24px;
+        overflow: hidden;
+      "
+    >
+      <div
+        class="modal-header"
+        style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 24px"
+      >
+        <h5 class="modal-title d-flex align-items-center" style="color: white; font-weight: 600">
+          <div
+            style="
+              width: 36px;
+              height: 36px;
+              background: linear-gradient(135deg, var(--warning), #d97706);
+              border-radius: 12px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin-right: 12px;
+            "
+          >
+            <i class="fas fa-key" style="color: white; font-size: 16px"></i>
+          </div>
+          Changer le mot de passe
+        </h5>
+        <button
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          style="filter: brightness(0.8)"
+        ></button>
+      </div>
+      <div class="modal-body" style="padding: 24px">
+        <form id="vaultChangePasswordForm">
+          <div class="mb-4">
+            <label
+              for="vaultOldPassword"
+              class="form-label"
+              style="
+                color: var(--muted);
+                font-size: 14px;
+                font-weight: 600;
+                margin-bottom: 8px;
+              "
+            >
+              Mot de passe actuel
+            </label>
+            <div class="position-relative">
+              <i
+                class="fas fa-lock position-absolute"
+                style="top: 50%; left: 16px; transform: translateY(-50%); color: var(--muted); z-index: 2"
+              ></i>
+              <input
+                type="password"
+                id="vaultOldPassword"
+                class="form-control"
+                placeholder="Mot de passe actuel"
+                required
+                style="
+                  padding-left: 46px;
+                  background: rgba(255, 255, 255, 0.05);
+                  border: 1px solid rgba(255, 255, 255, 0.1);
+                  border-radius: 16px;
+                  color: var(--text);
+                  height: 48px;
+                  transition: all 0.3s ease;
+                "
+                onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 3px rgba(108, 140, 255, 0.1)';"
+                onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none';"
+              />
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label
+              for="vaultNewPassword"
+              class="form-label"
+              style="
+                color: var(--muted);
+                font-size: 14px;
+                font-weight: 600;
+                margin-bottom: 8px;
+              "
+            >
+              Nouveau mot de passe
+            </label>
+            <div class="position-relative">
+              <i
+                class="fas fa-key position-absolute"
+                style="top: 50%; left: 16px; transform: translateY(-50%); color: var(--muted); z-index: 2"
+              ></i>
+              <input
+                type="password"
+                id="vaultNewPassword"
+                class="form-control"
+                placeholder="Nouveau mot de passe"
+                required
+                style="
+                  padding-left: 46px;
+                  background: rgba(255, 255, 255, 0.05);
+                  border: 1px solid rgba(255, 255, 255, 0.1);
+                  border-radius: 16px;
+                  color: var(--text);
+                  height: 48px;
+                  transition: all 0.3s ease;
+                "
+                onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 3px rgba(108, 140, 255, 0.1)';"
+                onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none';"
+              />
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label
+              for="vaultConfirmPassword"
+              class="form-label"
+              style="
+                color: var(--muted);
+                font-size: 14px;
+                font-weight: 600;
+                margin-bottom: 8px;
+              "
+            >
+              Confirmer le mot de passe
+            </label>
+            <div class="position-relative">
+              <i
+                class="fas fa-redo position-absolute"
+                style="top: 50%; left: 16px; transform: translateY(-50%); color: var(--muted); z-index: 2"
+              ></i>
+              <input
+                type="password"
+                id="vaultConfirmPassword"
+                class="form-control"
+                placeholder="Confirmer le mot de passe"
+                required
+                style="
+                  padding-left: 46px;
+                  background: rgba(255, 255, 255, 0.05);
+                  border: 1px solid rgba(255, 255, 255, 0.1);
+                  border-radius: 16px;
+                  color: var(--text);
+                  height: 48px;
+                  transition: all 0.3s ease;
+                "
+                onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 3px rgba(108, 140, 255, 0.1)';"
+                onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none';"
+              />
+            </div>
+          </div>
+
+          <div
+            class="alert"
+            role="alert"
+            style="
+              background: rgba(245, 158, 11, 0.1);
+              border: 1px solid rgba(245, 158, 11, 0.3);
+              color: var(--warning);
+              border-radius: 16px;
+              padding: 16px;
+              margin-bottom: 24px;
+            "
+          >
+            <div class="d-flex align-items-start gap-3">
+              <i class="fas fa-exclamation-triangle mt-1" style="font-size: 18px"></i>
+              <div>
+                <strong style="display: block; margin-bottom: 4px">Attention:</strong>
+                Cela va re-chiffrer tous vos identifiants avec le nouveau mot de passe.
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="text-danger small d-none"
+            id="vaultChangePasswordError"
+            style="
+              background: rgba(239, 68, 68, 0.1);
+              border: 1px solid rgba(239, 68, 68, 0.3);
+              padding: 12px 16px;
+              border-radius: 12px;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+            "
+          >
+            <i class="fas fa-exclamation-circle"></i>
+            <span></span>
+          </div>
+        </form>
+      </div>
+      <div
+        class="modal-footer"
+        style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding: 24px"
+      >
+        <button
+          class="btn"
+          data-bs-dismiss="modal"
+          style="
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+          "
+          onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.borderColor='rgba(255, 255, 255, 0.2)';"
+          onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'; this.style.borderColor='rgba(255, 255, 255, 0.1)';"
+        >
+          Annuler
+        </button>
+        <button
+          class="btn"
+          id="confirmVaultChangePassword"
+          style="
+            background: linear-gradient(135deg, var(--warning), #d97706);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            box-shadow: 0 8px 24px rgba(245, 158, 11, 0.4);
+            transition: all 0.3s ease;
+          "
+          onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 32px rgba(245, 158, 11, 0.6)';"
+          onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 24px rgba(245, 158, 11, 0.4)';"
+        >
+          <i class="fas fa-key me-2"></i> Changer le mot de passe
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUPPRESSION DU COFFRE -->
+<div class="modal fade" id="vaultDeleteModal" tabindex="-1">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div
+      class="modal-content"
+      style="
+        background: rgba(18, 25, 53, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 24px;
+        overflow: hidden;
+      "
+    >
+      <div
+        class="modal-header"
+        style="
+          border-bottom: 1px solid rgba(239, 68, 68, 0.3);
+          padding: 24px;
+          background: rgba(239, 68, 68, 0.1);
+        "
+      >
+        <h5 class="modal-title d-flex align-items-center" style="color: white; font-weight: 600">
+          <div
+            style="
+              width: 36px;
+              height: 36px;
+              background: linear-gradient(135deg, var(--danger), #dc2626);
+              border-radius: 12px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin-right: 12px;
+            "
+          >
+            <i class="fas fa-trash" style="color: white; font-size: 16px"></i>
+          </div>
+          Supprimer le coffre
+        </h5>
+        <button
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          style="filter: brightness(0.8)"
+        ></button>
+      </div>
+      <div class="modal-body" style="padding: 24px">
+        <div
+          class="alert"
+          role="alert"
+          style="
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--danger);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 24px;
+          "
+        >
+          <div class="d-flex align-items-start gap-3">
+            <i class="fas fa-exclamation-triangle mt-1" style="font-size: 18px"></i>
+            <div>
+              <strong style="display: block; margin-bottom: 4px">Attention !</strong>
+              Cette action est <strong>irréversible</strong>. Tous les identifiants du coffre seront supprimés.
+            </div>
+          </div>
+        </div>
+
+        <form id="vaultDeleteForm">
+          <div class="mb-4">
+            <label
+              for="vaultDeletePassword"
+              class="form-label"
+              style="
+                color: var(--muted);
+                font-size: 14px;
+                font-weight: 600;
+                margin-bottom: 8px;
+              "
+            >
+              Confirmez en entrant le mot de passe du coffre
+            </label>
+            <div class="position-relative">
+              <i
+                class="fas fa-key position-absolute"
+                style="top: 50%; left: 16px; transform: translateY(-50%); color: var(--muted); z-index: 2"
+              ></i>
+              <input
+                type="password"
+                id="vaultDeletePassword"
+                class="form-control"
+                placeholder="Mot de passe du coffre"
+                required
+                style="
+                  padding-left: 46px;
+                  background: rgba(255, 255, 255, 0.05);
+                  border: 1px solid rgba(239, 68, 68, 0.3);
+                  border-radius: 16px;
+                  color: var(--text);
+                  height: 48px;
+                  transition: all 0.3s ease;
+                "
+                onfocus="this.style.borderColor='var(--danger)'; this.style.boxShadow='0 0 0 3px rgba(239, 68, 68, 0.1)';"
+                onblur="this.style.borderColor='rgba(239, 68, 68, 0.3)'; this.style.boxShadow='none';"
+              />
+            </div>
+          </div>
+
+          <div
+            class="text-danger small d-none"
+            id="vaultDeleteError"
+            style="
+              background: rgba(239, 68, 68, 0.1);
+              border: 1px solid rgba(239, 68, 68, 0.3);
+              padding: 12px 16px;
+              border-radius: 12px;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+            "
+          >
+            <i class="fas fa-exclamation-circle"></i>
+            <span></span>
+          </div>
+        </form>
+      </div>
+      <div
+        class="modal-footer"
+        style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding: 24px"
+      >
+        <button
+          class="btn"
+          data-bs-dismiss="modal"
+          style="
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+          "
+          onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.borderColor='rgba(255, 255, 255, 0.2)';"
+          onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'; this.style.borderColor='rgba(255, 255, 255, 0.1)';"
+        >
+          Annuler
+        </button>
+        <button
+          class="btn"
+          id="confirmVaultDelete"
+          style="
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
+            transition: all 0.3s ease;
+          "
+          onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 32px rgba(239, 68, 68, 0.6)';"
+          onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 24px rgba(239, 68, 68, 0.4)';"
+        >
+          <i class="fas fa-trash me-2"></i> Supprimer définitivement
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Variables globales
+  let currentVaultSlug = null;
+  let currentEditVaultId = null;
+  let autoCloseTimer = null;
+  let currentVaultSlugForPassword = null;
+  let currentVaultSlugForDelete = null;
+  let currentVaultCardForDelete = null;
+
+  // ============================================
+  // FONCTIONS DE GESTION DES DROPDOWNS FIXED
+  // ============================================
+
+  // Créer dynamiquement le contenu du dropdown
+  function createDropdownContent(slug, credentialCount, vaultId, vaultName) {
+    return `
+      <div class="dropdown-menu-custom" id="dropdownMenu${slug}" style="
+        display: block;
+        position: fixed;
+        background: rgba(18, 25, 53, 0.98);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(108, 140, 255, 0.3);
+        border-radius: 20px;
+        padding: 12px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(108, 140, 255, 0.2);
+        min-width: 280px;
+        z-index: 9999;
+        transform-origin: bottom right;
+        animation: dropdownFadeUp 0.2s ease;
+      ">
+        <!-- En-tête du dropdown -->
+        <div class="px-3 py-2 mb-2" style="
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          color: white;
+          font-weight: 600;
+          font-size: 14px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        ">
+          <div style="
+            width: 32px;
+            height: 32px;
+            background: rgba(108, 140, 255, 0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          ">
+            <i class="fas fa-cog" style="color: var(--primary); font-size: 14px;"></i>
+          </div>
+          <span style="flex: 1;">Gestion du coffre</span>
+          <span style="
+            color: var(--muted);
+            font-size: 12px;
+            background: rgba(255,255,255,0.1);
+            padding: 4px 8px;
+            border-radius: 20px;
+          ">
+            ${credentialCount} identifiants
+          </span>
+        </div>
+        
+        <!-- Modifier -->
+        <div class="dropdown-item-custom btn-edit-vault" 
+             data-vault-id="${vaultId}"
+             data-vault-name="${vaultName}"
+             data-bs-toggle="modal"
+             data-bs-target="#vaultEditModal"
+             style="
+               padding: 12px 16px;
+               border-radius: 14px;
+               transition: all 0.3s ease;
+               color: white;
+               font-size: 14px;
+               margin-bottom: 4px;
+               display: flex;
+               align-items: center;
+               cursor: pointer;
+             "
+             onmouseover="this.style.background='rgba(108, 140, 255, 0.15)'; this.style.transform='translateX(6px)'"
+             onmouseout="this.style.background='transparent'; this.style.transform='translateX(0)'"
+             onclick="closeAllDropdowns()">
+          <div style="
+            width: 32px;
+            height: 32px;
+            background: rgba(108, 140, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+          ">
+            <i class="fas fa-edit" style="color: var(--primary); font-size: 14px;"></i>
+          </div>
+          <div style="flex: 1;">
+            <span style="display: block; font-weight: 600;">Modifier le coffre</span>
+            <span style="display: block; color: var(--muted); font-size: 12px; margin-top: 2px;">
+              Changer le nom ou la description
+            </span>
+          </div>
+          <i class="fas fa-chevron-right" style="color: var(--muted); font-size: 12px;"></i>
+        </div>
+        
+        <!-- Changer le mot de passe -->
+        <div class="dropdown-item-custom btn-edit-vault-password"
+             data-vault-slug="${slug}"
+             data-vault-name="${vaultName}"
+             style="
+               padding: 12px 16px;
+               border-radius: 14px;
+               transition: all 0.3s ease;
+               color: white;
+               font-size: 14px;
+               margin-bottom: 4px;
+               display: flex;
+               align-items: center;
+               cursor: pointer;
+             "
+             onmouseover="this.style.background='rgba(245, 158, 11, 0.15)'; this.style.transform='translateX(6px)'"
+             onmouseout="this.style.background='transparent'; this.style.transform='translateX(0)'"
+             onclick="closeAllDropdowns()">
+          <div style="
+            width: 32px;
+            height: 32px;
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+          ">
+            <i class="fas fa-key" style="color: var(--warning); font-size: 14px;"></i>
+          </div>
+          <div style="flex: 1;">
+            <span style="display: block; font-weight: 600;">Changer le mot de passe</span>
+            <span style="display: block; color: var(--muted); font-size: 12px; margin-top: 2px;">
+              Re-chiffrer tous les identifiants
+            </span>
+          </div>
+          <i class="fas fa-chevron-right" style="color: var(--muted); font-size: 12px;"></i>
+        </div>
+        
+        <!-- Supprimer -->
+        <div class="dropdown-item-custom btn-delete-vault"
+             data-slug="${slug}"
+             style="
+               padding: 12px 16px;
+               border-radius: 14px;
+               transition: all 0.3s ease;
+               color: #f87171;
+               font-size: 14px;
+               margin-bottom: 4px;
+               display: flex;
+               align-items: center;
+               cursor: pointer;
+             "
+             onmouseover="this.style.background='rgba(239, 68, 68, 0.15)'; this.style.transform='translateX(6px)'"
+             onmouseout="this.style.background='transparent'; this.style.transform='translateX(0)'"
+             onclick="closeAllDropdowns()">
+          <div style="
+            width: 32px;
+            height: 32px;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+          ">
+            <i class="fas fa-trash" style="color: var(--danger); font-size: 14px;"></i>
+          </div>
+          <div style="flex: 1;">
+            <span style="display: block; font-weight: 600;">Supprimer le coffre</span>
+            <span style="display: block; color: #f87171; font-size: 12px; margin-top: 2px;">
+              Action irréversible
+            </span>
+          </div>
+          <i class="fas fa-chevron-right" style="color: #f87171; font-size: 12px;"></i>
+        </div>
+        
+        <hr style="margin: 8px 0; border-color: rgba(255, 255, 255, 0.1);">
+        
+        <!-- Exporter -->
+        <div class="dropdown-item-custom d-flex align-items-center"
+             style="
+               padding: 12px 16px;
+               border-radius: 14px;
+               transition: all 0.3s ease;
+               color: white;
+               font-size: 14px;
+               display: flex;
+               align-items: center;
+               cursor: pointer;
+             "
+             onmouseover="this.style.background='rgba(34, 197, 94, 0.15)'; this.style.transform='translateX(6px)'"
+             onmouseout="this.style.background='transparent'; this.style.transform='translateX(0)'"
+             onclick="closeAllDropdowns()">
+          <div style="
+            width: 32px;
+            height: 32px;
+            background: rgba(34, 197, 94, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+          ">
+            <i class="fas fa-download" style="color: var(--success); font-size: 14px;"></i>
+          </div>
+          <div style="flex: 1;">
+            <span style="display: block; font-weight: 600;">Exporter CSV</span>
+            <span style="display: block; color: var(--muted); font-size: 12px; margin-top: 2px;">
+              Sauvegarder les identifiants
+            </span>
+          </div>
+          <i class="fas fa-chevron-right" style="color: var(--muted); font-size: 12px;"></i>
+        </div>
+      </div>
+    `;
+  }
+
+  // Fonction pour fermer tous les dropdowns
+  function closeAllDropdowns() {
+    document.querySelectorAll('.dropdown-menu-custom').forEach(el => {
+      el.remove();
+    });
+  }
+
+  // Fonction pour ouvrir/fermer le dropdown
+  function toggleDropdown(button, slug, credentialCount, vaultId, vaultName, event) {
+    event.stopPropagation();
+    
+    // Fermer tous les autres dropdowns
+    closeAllDropdowns();
+    
+    // Récupérer la position du bouton
+    const rect = button.getBoundingClientRect();
+    
+    // Créer le contenu du dropdown
+    const dropdownHTML = createDropdownContent(slug, credentialCount, vaultId, vaultName);
+    
+    // Ajouter le dropdown au body
+    document.body.insertAdjacentHTML('beforeend', dropdownHTML);
+    
+    // Positionner le dropdown
+    const dropdown = document.getElementById(`dropdownMenu${slug}`);
+    dropdown.style.top = (rect.top - dropdown.offsetHeight - 10) + 'px';
+    dropdown.style.left = (rect.right - dropdown.offsetWidth) + 'px';
+    dropdown.style.bottom = 'auto';
+    dropdown.style.right = 'auto';
+  }
+
+  // Fermer le dropdown au clic ailleurs
+  document.addEventListener('click', function(event) {
+    if (!event.target.closest('.dropdown') && !event.target.closest('.dropdown-menu-custom')) {
+      closeAllDropdowns();
+    }
+  });
+
+  // Fermer le dropdown à la touche Echap
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      closeAllDropdowns();
+    }
+  });
+
+  // ============================================
+  // FONCTIONS EXISTANTES (AJAX, MODALS, ETC)
+  // ============================================
+
+  // Initialiser les dropdowns Bootstrap pour les autres éléments
+  document.addEventListener("DOMContentLoaded", function () {
+    const dropdownElementList = [].slice.call(
+      document.querySelectorAll("[data-bs-toggle='dropdown']:not([onclick])"),
+    );
+    dropdownElementList.forEach(function (dropdownToggleEl) {
+      new bootstrap.Dropdown(dropdownToggleEl);
+    });
+  });
+
+  // Ouvrir le modal d'édition
+  $(document).on("click", ".btn-edit-vault", function () {
+    currentEditVaultId = $(this).data("vault-id");
+    const vaultName = $(this).data("vault-name");
+
+    $("#vaultEditName").val(vaultName);
+    $("#vaultEditDescription").val("");
+    $("#vaultEditError").addClass("d-none").text("");
+  });
+
+  // Confirmer la modification du coffre
+  $("#confirmVaultEdit").on("click", function () {
+    const vaultId = currentEditVaultId;
+    const vaultName = $("#vaultEditName").val();
+    const vaultDescription = $("#vaultEditDescription").val();
+    const masterPassword = $("#vaultEditPassword").val();
+
+    if (!vaultName.trim()) {
+      $("#vaultEditError").removeClass("d-none").text("Le nom du coffre est requis");
+      return;
+    }
+
+    if (!masterPassword.trim()) {
+      $("#vaultEditError").removeClass("d-none").text("Le mot de passe maître est requis");
+      return;
+    }
+
+    $.ajax({
+      url: `/vaults/${vaultId}/update/`,
+      type: "POST",
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+        "X-Requested-With": "XMLHttpRequest",
+      },
+      data: {
+        name: vaultName,
+        description: vaultDescription,
+        master_password: masterPassword,
+      },
+      success: function (response) {
+        if (response.success) {
+          // Mettre à jour le nom du coffre dans la carte
+          $(`[data-vault-id="${vaultId}"]`).closest(".vault-item").find("h4").text(vaultName);
+
+          // Fermer le modal
+          const modal = bootstrap.Modal.getInstance(document.getElementById("vaultEditModal"));
+          if (modal) modal.hide();
+
+          // Réinitialiser le formulaire
+          $("#vaultEditPassword").val("");
+          $("#vaultEditError").addClass("d-none").text("");
+
+          // Afficher un message de succès
+          const alert = $(
+            '<div class="alert alert-success alert-dismissible fade show" role="alert">' +
+              '<i class="fas fa-check-circle me-2"></i> Coffre modifié avec succès.' +
+              '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+              "</div>",
+          );
+          alert.hide().insertBefore(".fade-in-up").fadeIn(400).delay(3000).fadeOut(400, function () {
+            $(this).remove();
+          });
+        } else {
+          $("#vaultEditError")
+            .removeClass("d-none")
+            .text(response.message || "Erreur lors de la modification du coffre");
+        }
+      },
+      error: function (jqXHR) {
+        let errorMsg = "Erreur serveur";
+        if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+          errorMsg = jqXHR.responseJSON.message;
+        } else if (jqXHR.status === 400) {
+          errorMsg = "Mot de passe maître incorrect";
+        }
+        $("#vaultEditError").removeClass("d-none").text(errorMsg);
+      },
+    });
+  });
+
+  // Ouvrir le modal de changement de mot de passe
+  $(document).on("click", ".btn-edit-vault-password", function (e) {
+    e.preventDefault();
+    currentVaultSlugForPassword = $(this).data("vault-slug");
+    const vaultName = $(this).data("vault-name");
+
+    // Réinitialiser le formulaire
+    $("#vaultOldPassword").val("");
+    $("#vaultNewPassword").val("");
+    $("#vaultConfirmPassword").val("");
+    $("#vaultChangePasswordError").addClass("d-none").text("");
+
+    // Afficher le modal
+    const modal = new bootstrap.Modal(document.getElementById("vaultChangePasswordModal"));
+    modal.show();
+  });
+
+  // Confirmer le changement de mot de passe
+  $("#confirmVaultChangePassword").on("click", function () {
+    const vaultSlug = currentVaultSlugForPassword;
+    const oldPassword = $("#vaultOldPassword").val();
+    const newPassword = $("#vaultNewPassword").val();
+    const confirmPassword = $("#vaultConfirmPassword").val();
+
+    // Validations
+    if (!oldPassword.trim()) {
+      $("#vaultChangePasswordError").removeClass("d-none").text("Le mot de passe actuel est requis");
+      return;
+    }
+
+    if (!newPassword.trim()) {
+      $("#vaultChangePasswordError").removeClass("d-none").text("Le nouveau mot de passe est requis");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      $("#vaultChangePasswordError").removeClass("d-none").text("Les mots de passe ne correspondent pas");
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      $("#vaultChangePasswordError").removeClass("d-none").text("Le mot de passe doit contenir au moins 8 caractères");
+      return;
+    }
+
+    if (oldPassword === newPassword) {
+      $("#vaultChangePasswordError").removeClass("d-none").text("Le nouveau mot de passe doit être différent de l'ancien");
+      return;
+    }
+
+    $.ajax({
+      url: `/vaults/${vaultSlug}/change-password/`,
+      type: "POST",
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+        "X-Requested-With": "XMLHttpRequest",
+      },
+      data: {
+        old_password: oldPassword,
+        new_password: newPassword,
+      },
+      success: function (response) {
+        if (response.success) {
+          // Fermer le modal
+          const modal = bootstrap.Modal.getInstance(document.getElementById("vaultChangePasswordModal"));
+          if (modal) modal.hide();
+
+          // Afficher un message de succès
+          const alert = $(
+            '<div class="alert alert-success alert-dismissible fade show" role="alert">' +
+              '<i class="fas fa-check-circle me-2"></i> Mot de passe du coffre changé avec succès.' +
+              '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+              "</div>",
+          );
+          alert.hide().insertBefore(".fade-in-up").fadeIn(400).delay(3000).fadeOut(400, function () {
+            $(this).remove();
+          });
+        } else {
+          $("#vaultChangePasswordError")
+            .removeClass("d-none")
+            .text(response.message || "Erreur lors du changement de mot de passe");
+        }
+      },
+      error: function (jqXHR) {
+        let errorMsg = "Erreur serveur";
+        if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+          errorMsg = jqXHR.responseJSON.message;
+        } else if (jqXHR.status === 400) {
+          errorMsg = "Mot de passe actuel incorrect";
+        }
+        $("#vaultChangePasswordError").removeClass("d-none").text(errorMsg);
+      },
+    });
+  });
+
+  // Ouvrir le modal du mot de passe
+  $(document).on("click", ".btn-open-vault", function () {
+    currentVaultSlug = $(this).data("slug");
+    $("#vaultPasswordInput").val("");
+    $("#vaultPasswordError").addClass("d-none");
+
+    const modal = new bootstrap.Modal(document.getElementById("vaultPasswordModal"));
+    modal.show();
+  });
+
+  // Confirmer le mot de passe et accéder au vault
+  // Confirmer le mot de passe et accéder au vault
+$("#confirmVaultPassword").on("click", function () {
+    const password = $("#vaultPasswordInput").val();
+
+    $.ajax({
+        url: `/vaults/${currentVaultSlug}/access/`,
+        type: "POST",
+        contentType: "application/json",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+        },
+        data: JSON.stringify({ vault_password: password }),
+        success: function (data) {
+            if (data.success) {
+                // Stocker les infos du coffre ouvert
+                sessionStorage.setItem('openVaultId', data.vault.id);
+                sessionStorage.setItem('openVaultName', data.vault.name);
+                sessionStorage.setItem('openVaultExpiry', data.expiry);
+                
+                // Démarrer le timer
+                startVaultTimer(data.expiry);
+                
+                // Masquer la liste des coffres
+                $("#vaultsList").hide();
+
+                // Supprimer le contenu précédent
+                $("#vaultContent").remove();
+
+                // Container du vault
+                const vaultDiv = $(`
+                    <div id="vaultContent" class="mt-4 fade-in-up">
+                        <div class="d-flex align-items-center mb-4">
+                            <button class="btn me-3" id="backToVaults" style="
+                                background: rgba(255, 255, 255, 0.05);
+                                border: 1px solid rgba(255, 255, 255, 0.1);
+                                color: var(--text);
+                                padding: 10px 20px;
+                                border-radius: 12px;
+                                font-weight: 600;
+                                transition: all 0.3s ease;
+                            "
+                            onmouseover="this.style.background='rgba(108, 140, 255, 0.1)'; this.style.borderColor='rgba(108, 140, 255, 0.3)'"
+                            onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'; this.style.borderColor='rgba(255, 255, 255, 0.1)'">
+                                <i class="fas fa-arrow-left me-2"></i> Retour aux coffres
+                            </button>
+                            <h3 class="mb-0 gradient-text">${data.vault.name}</h3>
+                        </div>
+                        <div class="row g-4" id="credentialsContainer"></div>
+                    </div>
+                `);
+                $(".fade-in-up").after(vaultDiv);
+
+                // Ajouter les credentials avec effet fade
+                data.vault.credentials.forEach((c) => {
+                    const card = $(`
+                        <div class="col-md-6 col-lg-4 credential-item">
+                            <div class="position-relative hover-lift" style="
+                                background: linear-gradient(135deg, rgba(18, 25, 53, 0.8), rgba(15, 21, 48, 0.8));
+                                border: 1px solid rgba(255, 255, 255, 0.1);
+                                border-radius: 20px;
+                                padding: 24px;
+                                backdrop-filter: blur(10px);
+                                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                            ">
+                                ${c.category ? `<span class="position-absolute top-0 end-0 m-3" style="
+                                    background: var(--gradient-primary);
+                                    color: white;
+                                    padding: 4px 12px;
+                                    border-radius: 20px;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                ">${c.category}</span>` : ""}
+                                <h5 class="mb-3" style="color: white; font-weight: 600; padding-right: ${c.category ? "60px" : "0"}">${c.title}</h5>
+                                <div class="mb-3">
+                                    <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 4px;">Login:</div>
+                                    <div style="color: white; font-size: 14px;">${c.username || "-"}</div>
+                                </div>
+                                <div class="mb-3">
+                                    <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 4px;">URL:</div>
+                                    <div style="color: var(--primary); font-size: 14px;">
+                                        <a href="${c.url}" target="_blank" style="color: var(--primary); text-decoration: none;">${c.url || "-"}</a>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 4px;">Password:</div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="masked-password" style="color: white; font-size: 14px;">••••••••</span>
+                                        <button class="btn toggle-password" style="
+                                            padding: 6px 12px;
+                                            background: rgba(255, 255, 255, 0.05);
+                                            border: 1px solid rgba(255, 255, 255, 0.1);
+                                            border-radius: 8px;
+                                            color: var(--text);
+                                        ">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn copy-password" data-password="${c.password}" style="
+                                            padding: 6px 12px;
+                                            background: rgba(34, 197, 94, 0.1);
+                                            border: 1px solid rgba(34, 197, 94, 0.3);
+                                            border-radius: 8px;
+                                            color: var(--success);
+                                        ">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 4px;">Notes:</div>
+                                    <div style="color: white; font-size: 14px;">${c.notes || "-"}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+                    card.hide().appendTo("#credentialsContainer").fadeIn(400);
+                });
+
+                $("#vaultPasswordModal").modal("hide");
+                
+                showNotification(`Coffre "${data.vault.name}" ouvert`, 'success');
+            } else {
+                $("#vaultPasswordError").removeClass("d-none");
+            }
+        },
+        error: function () {
+            $("#vaultPasswordError").removeClass("d-none");
+        },
+    });
+});
+
+  // Retour aux coffres (manuel)
+  $(document).on("click", "#backToVaults", function () {
+    if (autoCloseTimer) {
+      clearTimeout(autoCloseTimer);
+      autoCloseTimer = null;
+    }
+    $("#vaultContent").remove();
+    $("#vaultsList").fadeIn(400);
+  });
+
+  // Toggle password visible / masqué
+  $(document).on("click", ".toggle-password", function () {
+    const span = $(this).siblings(".masked-password");
+    const icon = $(this).find("i");
+
+    if (span.text() === "••••••••") {
+      span.text($(this).siblings(".copy-password").data("password"));
+      icon.removeClass("fa-eye").addClass("fa-eye-slash");
+    } else {
+      span.text("••••••••");
+      icon.removeClass("fa-eye-slash").addClass("fa-eye");
+    }
+  });
+
+  // Copier le mot de passe
+  $(document).on("click", ".copy-password", function () {
+    const password = $(this).data("password");
+    navigator.clipboard.writeText(password).then(() => {
+      const originalHtml = $(this).html();
+      $(this).html('<i class="fas fa-check"></i>');
+      $(this).css({
+        background: "rgba(34, 197, 94, 0.2)",
+        "border-color": "rgba(34, 197, 94, 0.4)",
+      });
+
+      setTimeout(() => {
+        $(this).html(originalHtml);
+        $(this).css({
+          background: "rgba(34, 197, 94, 0.1)",
+          "border-color": "rgba(34, 197, 94, 0.3)",
+        });
+      }, 1000);
+    });
+  });
+
+  // Recherche globale sur coffres et credentials
+  $("#globalSearch").on("input", function () {
+    const query = $(this).val().toLowerCase();
+
+    if ($("#vaultContent").length) {
+      // Filtrer les credentials
+      $(".credential-item").each(function () {
+        const title = $(this).find("h5").text().toLowerCase();
+        const login = $(this).find('div:contains("Login:")').next().text().toLowerCase();
+        const url = $(this).find('div:contains("URL:")').next().text().toLowerCase();
+        if (title.includes(query) || login.includes(query) || url.includes(query)) {
+          $(this).fadeIn(200);
+        } else {
+          $(this).fadeOut(200);
+        }
+      });
+    } else {
+      // Filtrer les coffres
+      $(".vault-item").each(function () {
+        const name = $(this).data("name");
+        if (name.includes(query)) {
+          $(this).fadeIn(200);
+        } else {
+          $(this).fadeOut(200);
+        }
+      });
+    }
+  });
+
+  // Supprimer vault - Ouvrir modale
+  $(document).on("click", ".btn-delete-vault", function (e) {
+    e.preventDefault();
+    currentVaultSlugForDelete = $(this).data("slug");
+    currentVaultCardForDelete = $(this).closest(".vault-item");
+
+    // Réinitialiser le formulaire
+    $("#vaultDeletePassword").val("");
+    $("#vaultDeleteError").addClass("d-none").text("");
+
+    // Afficher la modale
+    const modal = new bootstrap.Modal(document.getElementById("vaultDeleteModal"));
+    modal.show();
+  });
+
+  // Confirmer la suppression du coffre
+  $("#confirmVaultDelete").on("click", function () {
+    const vaultSlug = currentVaultSlugForDelete;
+    const password = $("#vaultDeletePassword").val();
+
+    if (!password.trim()) {
+      $("#vaultDeleteError").removeClass("d-none").text("Le mot de passe du coffre est requis");
+      return;
+    }
+
+    $.ajax({
+      url: `/vaults/${vaultSlug}/delete/`,
+      type: "POST",
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+        "X-Requested-With": "XMLHttpRequest",
+      },
+      data: {
+        password: password,
+      },
+      success: function (response) {
+        if (response.success) {
+          // Fermer la modale
+          const modal = bootstrap.Modal.getInstance(document.getElementById("vaultDeleteModal"));
+          if (modal) modal.hide();
+
+          // Animer la suppression de la carte
+          currentVaultCardForDelete.fadeOut(400, function () {
+            $(this).remove();
+          });
+
+          // Afficher un message de succès
+          const alert = $(
+            '<div class="alert fade-in-up" style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); color: var(--success); border-radius: 16px; padding: 16px; margin-top: 20px; display: flex; align-items: center; gap: 12px;">' +
+              '<i class="fas fa-check-circle"></i>' +
+              "<div>Coffre supprimé avec succès.</div>" +
+              "</div>",
+          );
+          alert.hide().insertAfter(".fade-in-up").fadeIn(400).delay(3000).fadeOut(400, function () {
+            $(this).remove();
+          });
+        } else {
+          $("#vaultDeleteError")
+            .removeClass("d-none")
+            .text(response.message || "Erreur lors de la suppression du coffre");
+        }
+      },
+      error: function (jqXHR) {
+        let errorMsg = "Erreur serveur";
+        if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+          errorMsg = jqXHR.responseJSON.message;
+        } else if (jqXHR.status === 400) {
+          errorMsg = "Mot de passe incorrect";
+        }
+        $("#vaultDeleteError").removeClass("d-none").text(errorMsg);
+      },
+    });
+  });
+</script>
+
+<style>
+  .fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes shine {
+    0%,
+    100% {
+      transform: translateX(-100%);
+    }
+    50% {
+      transform: translateX(100%);
+    }
+  }
+
+  /* Animation pour le dropdown vers le haut */
+  @keyframes dropdownFadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Style pour les dropdowns personnalisés */
+  .dropdown-menu-custom {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  /* Style pour les items du dropdown */
+  .dropdown-item-custom {
+    transition: all 0.3s ease;
+  }
+
+  .dropdown-item-custom:hover {
+    background: rgba(108, 140, 255, 0.15);
+    transform: translateX(6px);
+  }
+
+  /* Style pour les cartes */
+  .vault-item {
+    transition: all 0.3s ease;
+  }
+
+  .hover-lift {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease !important;
+  }
+
+  /* Style pour les alertes */
+  .alert {
+    animation: slideIn 0.3s ease;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Responsive pour mobile */
+  @media (max-width: 768px) {
+    .dropdown-menu-custom {
+      position: fixed !important;
+      bottom: 20px !important;
+      top: auto !important;
+      left: 20px !important;
+      right: 20px !important;
+      width: auto !important;
+      min-width: auto !important;
+      transform: none !important;
+    }
+  }
+  /* Animation de pulsation */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
+}
+
+/* Animation de glow pour le coffre ouvert */
+.vault-opened .position-relative {
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
+  }
+  to {
+    box-shadow: 0 0 30px rgba(34, 197, 94, 0.4);
+  }
+}
+
+/* Style pour l'indicateur de coffre ouvert */
+#openVaultIndicator {
+  z-index: 1000;
+}
+</style>
+{% endblock %}

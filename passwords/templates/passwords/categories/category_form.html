@@ -1,0 +1,73 @@
+{% extends "passwords/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-folder me-2"></i>{{ title }}</h2>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card" >
+            <div class="card-header">
+                <h5 class="mb-0" style="color:black">
+                    <i class="fas fa-edit me-2"></i>Informations de la catégorie
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label" style="color:black">
+                            <i class="fas fa-lock me-1"></i>{{ form.vault.label }}
+                        </label>
+                        {{ form.vault }}
+                        {% if form.vault.help_text %}
+                        <div class="form-text">{{ form.vault.help_text }}</div>
+                        {% endif %}
+                        {% if form.vault.errors %}
+                        <div class="text-danger small">{{ form.vault.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" style="color:black">
+                            <i class="fas fa-tag me-1"></i>{{ form.name.label }}
+                        </label>
+                        {{ form.name }}
+                        {% if form.name.help_text %}
+                        <div class="form-text">{{ form.name.help_text }}</div>
+                        {% endif %}
+                        {% if form.name.errors %}
+                        <div class="text-danger small">{{ form.name.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" style="color:black ">
+                            <i class="fas fa-folder me-1"></i>{{ form.parent.label }}
+                        </label>
+                        {{ form.parent }}
+                        {% if form.parent.help_text %}
+                        <div class="form-text">{{ form.parent.help_text }}</div>
+                        {% endif %}
+                        {% if form.parent.errors %}
+                        <div class="text-danger small">{{ form.parent.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Enregistrer
+                        </button>
+                        <a href="{% url 'category_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Retour
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

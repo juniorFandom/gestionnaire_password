@@ -1,0 +1,600 @@
+{% extends "passwords/base.html" %}
+{% block title %}Historique - SecureVault{% endblock %}
+
+{% block content %}
+<div class="main-content">
+  <div class="container" style="max-width: 1280px; margin: 0 auto; padding: 0 24px;">
+    <!-- En-tête stylisé -->
+    <div class="d-flex justify-content-between align-items-center mb-5">
+      <div>
+        <h1 class="d-flex align-items-center gap-3 mb-2" style="font-size: 32px; font-weight: 700;">
+          <div class="logo-orb" style="width: 48px; height: 48px;">
+            <i class="fas fa-history logo-icon" style="font-size: 20px;"></i>
+          </div>
+          <span class="gradient-text">Historique des actions</span>
+        </h1>
+        <p style="color: var(--muted); margin: 0; font-size: 16px;">
+          Consultez toutes les actions effectuées sur votre compte
+        </p>
+      </div>
+    </div>
+
+    <!-- Statistiques rapides -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <div class="position-relative hover-lift" style="
+          background: linear-gradient(135deg, rgba(18, 25, 53, 0.8), rgba(15, 21, 48, 0.8));
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 16px;
+          padding: 20px;
+          backdrop-filter: blur(10px);
+          transition: all 0.3s ease;
+        "
+        onmouseover="this.style.borderColor='rgba(108, 140, 255, 0.3)'; this.style.transform='translateY(-4px)'"
+        onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.transform='translateY(0)'">
+          <div class="d-flex align-items-center gap-3">
+            <div style="
+              width: 48px;
+              height: 48px;
+              background: rgba(108, 140, 255, 0.2);
+              border-radius: 12px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            ">
+              <i class="fas fa-list" style="color: var(--primary); font-size: 20px;"></i>
+            </div>
+            <div>
+              <div style="color: var(--muted); font-size: 12px; font-weight: 600;">Total des actions</div>
+              <div style="color: white; font-size: 24px; font-weight: 700;">{{ audit_logs|length }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtres stylisés -->
+    <div class="row g-3 mb-4 fade-in-up">
+      <div class="col-md-3">
+        <select 
+          class="form-control" 
+          id="actionFilter" 
+          onchange="filterLogs()"
+          style="
+            width: 100%;
+            padding: 14px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            color: var(--text);
+            font-size: 14px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+          "
+          onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 3px rgba(108, 140, 255, 0.1)'"
+          onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none'"
+        >
+          <option value="" style="color: black;">Toutes les actions</option>
+          <option value="create" style="color: black;">Créer</option>
+          <option value="read" style="color: black;">Lire</option>
+          <option value="update" style="color: black;">Modifier</option>
+          <option value="delete" style="color: black;">Supprimer</option>
+          <option value="export" style="color: black;">Exporter</option>
+        </select>
+      </div>
+      
+      <div class="col-md-3">
+        <select 
+          class="form-control" 
+          id="typeFilter" 
+          onchange="filterLogs()"
+          style="
+            width: 100%;
+            padding: 14px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            color: var(--text);
+            font-size: 14px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+          "
+          onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 3px rgba(108, 140, 255, 0.1)'"
+          onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none'"
+        >
+          <option value="" style="color: black;">Tous les types</option>
+          <option value="vault" style="color: black;">Coffre</option>
+          <option value="credential" style="color: black;">Identifiant</option>
+          <option value="category" style="color: black;">Catégorie</option>
+        </select>
+      </div>
+      
+      <div class="col-md-6">
+        <div class="position-relative">
+          <i class="fas fa-search position-absolute" style="top: 50%; left: 16px; transform: translateY(-50%); color: var(--muted); z-index: 2;"></i>
+          <input
+            type="text"
+            id="searchFilter"
+            class="form-control"
+            placeholder="Rechercher dans l'historique..."
+            onkeyup="filterLogs()"
+            style="
+              width: 100%;
+              padding: 14px 20px 14px 46px;
+              background: rgba(255, 255, 255, 0.05);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              border-radius: 16px;
+              color: var(--text);
+              font-size: 14px;
+              transition: all 0.3s ease;
+              backdrop-filter: blur(10px);
+            "
+            onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 3px rgba(108, 140, 255, 0.1)'"
+            onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none'"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Table des logs -->
+    {% if audit_logs %}
+    <div class="fade-in-up" style="padding-bottom :200px">
+      <div class="position-relative" style="
+        background: linear-gradient(135deg, rgba(18, 25, 53, 0.8), rgba(15, 21, 48, 0.8));
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 0;
+        backdrop-filter: blur(10px);
+        overflow: hidden;
+        
+      ">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0" id="logsTable" style="color: var(--text); border-color: rgba(255, 255, 255, 0.1);">
+            <thead style="
+              background: rgba(108, 140, 255, 0.1);
+              border-bottom: 2px solid rgba(108, 140, 255, 0.2);
+            ">
+              <tr>
+                <th style="padding: 20px; border: none;">Date & Heure</th>
+                <th style="padding: 20px; border: none;">Action</th>
+                <th style="padding: 20px; border: none;">Type</th>
+                <th style="padding: 20px; border: none;">Ressource</th>
+                <th style="padding: 20px; border: none;">Détails</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for log in audit_logs %}
+              <tr
+                class="log-row"
+                data-action="{{ log.action }}"
+                data-type="{{ log.target_type }}"
+                data-search="{{ log.action|lower }} {{ log.target_type|lower }} {{ log.target_id|lower }}"
+                style="
+                  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                  transition: all 0.3s ease;
+                "
+                onmouseover="this.style.backgroundColor='rgba(108, 140, 255, 0.05)'"
+                onmouseout="this.style.backgroundColor='transparent'"
+              >
+                <!-- Date & Heure -->
+                <td style="padding: 20px;">
+                  <div style="color: black; font-weight: 600; margin-bottom: 4px;">
+                    {{ log.created_at|date:"d/m/Y" }}
+                  </div>
+                  <div style="color: black; font-size: 12px;">
+                    {{ log.created_at|date:"H:i:s" }}
+                  </div>
+                </td>
+
+                <!-- Action -->
+                <td style="padding: 20px;">
+                  {% if log.action == "create" %}
+                  <div class="d-flex align-items-center gap-2">
+                    <div style="
+                      width: 32px;
+                      height: 32px;
+                      background: rgba(34, 197, 94, 0.2);
+                      border-radius: 8px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                    ">
+                      <i class="fas fa-plus" style="color: var(--success); font-size: 14px;"></i>
+                    </div>
+                    <span style="color: var(--success); font-weight: 600;">Créé</span>
+                  </div>
+                  {% elif log.action == "read" %}
+                  <div class="d-flex align-items-center gap-2">
+                    <div style="
+                      width: 32px;
+                      height: 32px;
+                      background: rgba(59, 130, 246, 0.2);
+                      border-radius: 8px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                    ">
+                      <i class="fas fa-eye" style="color: var(--info); font-size: 14px;"></i>
+                    </div>
+                    <span style="color: var(--info); font-weight: 600;">Consulté</span>
+                  </div>
+                  {% elif log.action == "update" %}
+                  <div class="d-flex align-items-center gap-2">
+                    <div style="
+                      width: 32px;
+                      height: 32px;
+                      background: rgba(245, 158, 11, 0.2);
+                      border-radius: 8px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                    ">
+                      <i class="fas fa-edit" style="color: var(--warning); font-size: 14px;"></i>
+                    </div>
+                    <span style="color: var(--warning); font-weight: 600;">Modifié</span>
+                  </div>
+                  {% elif log.action == "delete" %}
+                  <div class="d-flex align-items-center gap-2">
+                    <div style="
+                      width: 32px;
+                      height: 32px;
+                      background: rgba(239, 68, 68, 0.2);
+                      border-radius: 8px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                    ">
+                      <i class="fas fa-trash" style="color: var(--danger); font-size: 14px;"></i>
+                    </div>
+                    <span style="color: var(--danger); font-weight: 600;">Supprimé</span>
+                  </div>
+                  {% elif log.action == "export" %}
+                  <div class="d-flex align-items-center gap-2">
+                    <div style="
+                      width: 32px;
+                      height: 32px;
+                      background: rgba(108, 140, 255, 0.2);
+                      border-radius: 8px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                    ">
+                      <i class="fas fa-download" style="color: var(--primary); font-size: 14px;"></i>
+                    </div>
+                    <span style="color: var(--primary); font-weight: 600;">Exporté</span>
+                  </div>
+                  {% else %}
+                  <span style="
+                    background: rgba(255, 255, 255, 0.1);
+                    color: var(--text);
+                    padding: 6px 12px;
+                    border-radius: 20px;
+                    font-size: 12px;
+                    font-weight: 600;
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                  ">
+                    {{ log.action }}
+                  </span>
+                  {% endif %}
+                </td>
+
+                <!-- Type -->
+                <td style="padding: 20px;">
+                  {% if log.target_type %}
+                  <span style="
+                    background: rgba(255, 255, 255, 0.05);
+                    color: black;
+                    padding: 6px 12px;
+                    border-radius: 20px;
+                    font-size: 12px;
+                    font-weight: 600;
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                  ">
+                    {{ log.target_type }}
+                  </span>
+                  {% else %}
+                  <span style="color: black; font-size: 14px;">-</span>
+                  {% endif %}
+                </td>
+
+                <!-- Ressource -->
+                <td style="padding: 20px;">
+                  {% if log.vault %}
+                  <strong style="color: white; display: block; margin-bottom: 4px;">
+                    {{ log.vault.name }}
+                  </strong>
+                  <div style="color: var(--muted); font-size: 12px;">
+                    ID: {{ log.target_id }}
+                  </div>
+                  {% else %}
+                  <div style="color: var(--muted); font-size: 14px;">
+                    ID: {{ log.target_id }}
+                  </div>
+                  {% endif %}
+                </td>
+
+                <!-- Détails -->
+                <td style="padding: 20px;">
+                  {% if log.user %}
+                  <div style="color: white; font-weight: 600; margin-bottom: 4px;">
+                    {{ log.user.username }}
+                  </div>
+                  {% if log.details %}
+                  <div style="color: var(--muted); font-size: 12px; max-width: 200px;">
+                    {{ log.details|truncatechars:30 }}
+                  </div>
+                  {% endif %}
+                  {% else %}
+                  <span style="color: var(--muted); font-size: 14px;">-</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination stylisée -->
+    {% if is_paginated %}
+    <nav aria-label="Page navigation" style="margin-top: 24px;">
+      <ul class="pagination justify-content-center" style="gap: 8px;">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a 
+            class="page-link" 
+            href="?page=1"
+            style="
+              background: rgba(255, 255, 255, 0.05);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              border-radius: 12px;
+              color: var(--text);
+              padding: 8px 16px;
+              transition: all 0.3s ease;
+            "
+            onmouseover="this.style.background='rgba(108, 140, 255, 0.1)'; this.style.borderColor='rgba(108, 140, 255, 0.3)'"
+            onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'; this.style.borderColor='rgba(255, 255, 255, 0.1)'"
+          >
+            Première
+          </a>
+        </li>
+        <li class="page-item">
+          <a 
+            class="page-link" 
+            href="?page={{ page_obj.previous_page_number }}"
+            style="
+              background: rgba(255, 255, 255, 0.05);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              border-radius: 12px;
+              color: var(--text);
+              padding: 8px 16px;
+              transition: all 0.3s ease;
+            "
+            onmouseover="this.style.background='rgba(108, 140, 255, 0.1)'; this.style.borderColor='rgba(108, 140, 255, 0.3)'"
+            onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'; this.style.borderColor='rgba(255, 255, 255, 0.1)'"
+          >
+            Précédente
+          </a>
+        </li>
+        {% endif %}
+        
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+          <li class="page-item active">
+            <span 
+              class="page-link"
+              style="
+                background: var(--gradient-primary);
+                border: none;
+                border-radius: 12px;
+                color: white;
+                padding: 8px 16px;
+                font-weight: 600;
+                box-shadow: 0 4px 12px rgba(108, 140, 255, 0.4);
+              "
+            >
+              {{ num }}
+            </span>
+          </li>
+          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <li class="page-item">
+            <a 
+              class="page-link" 
+              href="?page={{ num }}"
+              style="
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 12px;
+                color: var(--text);
+                padding: 8px 16px;
+                transition: all 0.3s ease;
+              "
+              onmouseover="this.style.background='rgba(108, 140, 255, 0.1)'; this.style.borderColor='rgba(108, 140, 255, 0.3)'"
+              onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'; this.style.borderColor='rgba(255, 255, 255, 0.1)'"
+            >
+              {{ num }}
+            </a>
+          </li>
+          {% endif %}
+        {% endfor %}
+        
+        {% if page_obj.has_next %}
+        <li class="page-item">
+          <a 
+            class="page-link" 
+            href="?page={{ page_obj.next_page_number }}"
+            style="
+              background: rgba(255, 255, 255, 0.05);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              border-radius: 12px;
+              color: var(--text);
+              padding: 8px 16px;
+              transition: all 0.3s ease;
+            "
+            onmouseover="this.style.background='rgba(108, 140, 255, 0.1)'; this.style.borderColor='rgba(108, 140, 255, 0.3)'"
+            onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'; this.style.borderColor='rgba(255, 255, 255, 0.1)'"
+          >
+            Suivante
+          </a>
+        </li>
+        <li class="page-item">
+          <a 
+            class="page-link" 
+            href="?page={{ page_obj.paginator.num_pages }}"
+            style="
+              background: rgba(255, 255, 255, 0.05);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              border-radius: 12px;
+              color: var(--text);
+              padding: 8px 16px;
+              transition: all 0.3s ease;
+            "
+            onmouseover="this.style.background='rgba(108, 140, 255, 0.1)'; this.style.borderColor='rgba(108, 140, 255, 0.3)'"
+            onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'; this.style.borderColor='rgba(255, 255, 255, 0.1)'"
+          >
+            Dernière
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+    
+    <!-- Message si aucun historique -->
+    {% else %}
+    <div class="fade-in-up">
+      <div class="text-center py-5" style="
+        background: linear-gradient(135deg, rgba(18, 25, 53, 0.8), rgba(15, 21, 48, 0.8));
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+      ">
+        <div class="mb-4" style="
+          width: 80px;
+          height: 80px;
+          background: rgba(108, 140, 255, 0.2);
+          border-radius: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 20px;
+        ">
+          <i class="fas fa-history" style="font-size: 32px; color: var(--primary);"></i>
+        </div>
+        <h3 class="mb-2" style="color: black;">Aucun historique disponible</h3>
+        <p class="mb-4" style="color: black; max-width: 400px; margin: 0 auto;">
+          L'historique des actions s'affichera ici dès que vous effectuerez des actions sur votre compte.
+        </p>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  function filterLogs() {
+    const actionFilter = document.getElementById("actionFilter").value.toLowerCase();
+    const typeFilter = document.getElementById("typeFilter").value.toLowerCase();
+    const searchFilter = document.getElementById("searchFilter").value.toLowerCase();
+
+    const rows = document.querySelectorAll(".log-row");
+
+    rows.forEach((row) => {
+      const action = row.dataset.action.toLowerCase();
+      const type = row.dataset.type.toLowerCase();
+      const search = row.dataset.search.toLowerCase();
+
+      const matchAction = !actionFilter || action === actionFilter;
+      const matchType = !typeFilter || type === typeFilter;
+      const matchSearch = !searchFilter || search.includes(searchFilter);
+
+      if (matchAction && matchType && matchSearch) {
+        row.style.display = "";
+      } else {
+        row.style.display = "none";
+      }
+    });
+  }
+
+  // Initialiser les selects avec des icônes
+  document.addEventListener('DOMContentLoaded', function() {
+    // Style personnalisé pour les selects
+    const selects = document.querySelectorAll('select');
+    selects.forEach(select => {
+      select.style.backgroundImage = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%239aa3b2' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E")`;
+      select.style.backgroundRepeat = 'no-repeat';
+      select.style.backgroundPosition = 'right 16px center';
+      select.style.backgroundSize = '16px';
+      select.style.paddingRight = '48px';
+      
+      select.addEventListener('focus', function() {
+        this.style.backgroundImage = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c8cff' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E")`;
+      });
+      
+      select.addEventListener('blur', function() {
+        this.style.backgroundImage = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%239aa3b2' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E")`;
+      });
+    });
+
+    // Focus sur la recherche
+    setTimeout(() => {
+      document.getElementById('searchFilter').focus();
+    }, 300);
+  });
+</script>
+
+<style>
+  .fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Animation pour les lignes du tableau */
+  .log-row {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .log-row:hover {
+    transform: translateX(4px);
+  }
+
+  /* Style pour la pagination */
+  .pagination {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .pagination .page-link {
+    text-decoration: none;
+    display: block;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .table-responsive {
+      margin: 0 -16px;
+      border-radius: 0;
+    }
+    
+    .d-flex.gap-2 {
+      flex-wrap: wrap;
+    }
+    
+    .position-relative.hover-lift {
+      margin-bottom: 16px;
+    }
+  }
+</style>
+{% endblock %}

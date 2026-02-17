@@ -1,0 +1,73 @@
+{% extends "passwords/base.html" %}
+
+{% block title %}Connexion - Gestionnaire{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="panel fade-in-up" style="margin-top: 60px;">
+                <div style="text-align: center; margin-bottom: 32px;">
+                    <div class="logo" style="margin: 0 auto 16px auto;"></div>
+                    <h2 style="margin: 0 0 8px 0; font-size: 28px;">Connexion</h2>
+                    <p style="color: var(--muted); margin: 0;">Accédez à votre coffre-fort numérique</p>
+                </div>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+
+                    <div class="mb-4">
+                        <label class="form-label"
+                            style="display: block; margin-bottom: 8px; font-weight: 500; color: var(--text);">
+                            <i class="fas fa-envelope" style="margin-right: 8px; color: white;"></i>
+                            {{ form.email.label }}
+                        </label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                        <div style="color: var(--danger); font-size: 14px; margin-top: 4px;">
+                            {% for error in form.email.errors %}
+                            <i class="fas fa-exclamation-circle" style="margin-right: 4px; color:white"></i>{{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label"
+                            style="display: block; margin-bottom: 8px; font-weight: 500; color: var(--text);">
+                            <i class="fas fa-lock" style="margin-right: 8px; color: var(--muted);"></i>
+                            {{ form.password.label }}
+                        </label>
+                        {{ form.password }}
+                        {% if form.password.errors %}
+                        <div style="color: var(--danger); font-size: 14px; margin-top: 4px;">
+                            {% for error in form.password.errors %}
+                            <i class="fas fa-exclamation-circle" style="margin-right: 4px;"></i>{{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary"
+                        style="width: 100%; padding: 14px; font-size: 16px; font-weight: 600;">
+                        <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i>
+                        Se connecter
+                    </button>
+                </form>
+
+                <div
+                    style="text-align: center; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border);">
+                    <p style="color: var(--muted); margin: 0;">
+                        Pas encore de compte ?
+                        <a href="{% url 'register' %}"
+                            style="color: var(--primary); text-decoration: none; font-weight: 500;">
+                            Créer un compte
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

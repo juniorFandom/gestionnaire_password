@@ -1,0 +1,19 @@
+{% extends "passwords/base.html" %}
+
+{% block title %}Vérification OTP - Connexion{% endblock %}
+
+{% block content %}
+<div class="panel mt-5 mx-auto" style="max-width: 500px;">
+    <h2 class="mb-3">Vérification OTP</h2>
+    <p class="text-muted">Nous avons envoyé un code OTP à votre adresse email. Veuillez le saisir pour continuer.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="otp" class="form-label">Code OTP</label>
+            <input type="text" name="otp" id="otp" class="form-control" placeholder="Entrez le code OTP" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Confirmer</button>
+    </form>
+</div>
+{% endblock %}

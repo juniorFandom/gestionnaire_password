@@ -1,0 +1,1173 @@
+{% extends "passwords/base.html" %}
+{% block title %}Mes catégories - SecureVault{% endblock %}
+
+{% block content %}
+<div class="main-content">
+  <div class="container" style="max-width: 1280px; margin: 0 auto; padding: 0 24px;">
+    <!-- En-tête stylisé -->
+    <div class="d-flex justify-content-between align-items-center mb-5">
+      <div>
+        <h1 class="d-flex align-items-center gap-3 mb-2" style="font-size: 32px; font-weight: 700;">
+          <div class="logo-orb" style="width: 48px; height: 48px;">
+            <i class="fas fa-folder-open logo-icon" style="font-size: 20px;"></i>
+          </div>
+          <span class="gradient-text">Mes catégories</span>
+        </h1>
+        <p style="color: var(--muted); margin: 0; font-size: 16px;">
+          Organisez vos identifiants par catégories et sous-catégories
+        </p>
+      </div>
+      <button
+        class="btn hover-lift"
+        data-bs-toggle="modal"
+        data-bs-target="#categoryCreateModal"
+        style="
+          background: var(--gradient-primary);
+          color: white;
+          border: none;
+          padding: 12px 24px;
+          border-radius: 12px;
+          font-weight: 600;
+          font-size: 14px;
+          box-shadow: 0 8px 24px rgba(108, 140, 255, 0.4);
+          transition: all 0.3s ease;
+        "
+        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 32px rgba(108, 140, 255, 0.6)'"
+        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 24px rgba(108, 140, 255, 0.4)'"
+      >
+        <i class="fas fa-plus me-2"></i> Nouvelle catégorie
+      </button>
+    </div>
+
+    <!-- Barre de recherche et filtres stylisés -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-8">
+        <div class="position-relative">
+          <i class="fas fa-search position-absolute" style="top: 50%; left: 16px; transform: translateY(-50%); color: var(--muted); z-index: 2;"></i>
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Rechercher une catégorie..."
+            onkeyup="filterCategories()"
+            style="
+              width: 100%;
+              padding: 14px 20px 14px 46px;
+              background: rgba(255, 255, 255, 0.05);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              border-radius: 16px;
+              color: var(--text);
+              font-size: 14px;
+              transition: all 0.3s ease;
+              backdrop-filter: blur(10px);
+            "
+            onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 3px rgba(108, 140, 255, 0.1)'"
+            onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none'"
+          />
+        </div>
+      </div>
+      <div class="col-md-4">
+        <select 
+          class="form-control" 
+          id="vaultFilter" 
+          onchange="filterCategories()"
+          style="
+            width: 100%;
+            padding: 14px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            color: var(--text);
+            font-size: 14px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+          "
+          onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 3px rgba(108, 140, 255, 0.1)'"
+          onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none'"
+        >
+          <option value="">Tous les coffres</option>
+          {% for vault in vaults %}
+          <option value="{{ vault.name }}">{{ vault.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <!-- Boutons de changement de vue -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div class="d-flex gap-2">
+        <button 
+          class="btn" 
+          onclick="toggleView('grid')" 
+          id="gridViewBtn"
+          style="
+            background: rgba(108, 140, 255, 0.2);
+            color: var(--primary);
+            border: 1px solid rgba(108, 140, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+          "
+          onmouseover="this.style.background='var(--gradient-primary)'; this.style.color='white'; this.style.borderColor='transparent'"
+          onmouseout="this.style.background='rgba(108, 140, 255, 0.2)'; this.style.color='var(--primary)'; this.style.borderColor='rgba(108, 140, 255, 0.3)'"
+        >
+          <i class="fas fa-th me-2"></i> Grille
+        </button>
+        <button 
+          class="btn" 
+          onclick="toggleView('list')" 
+          id="listViewBtn"
+          style="
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+          "
+          onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.borderColor='rgba(255, 255, 255, 0.2)'"
+          onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'; this.style.borderColor='rgba(255, 255, 255, 0.1)'"
+        >
+          <i class="fas fa-list me-2"></i> Liste
+        </button>
+      </div>
+      <div class="text-muted small">
+        {{ categories|length }} catégorie{{ categories|length|pluralize:"s" }}
+      </div>
+    </div>
+
+    <!-- Vue en grille des catégories -->
+    <div id="categoriesGrid" class="row g-4 fade-in-up">
+      {% for category in categories %}
+      <div class="col-lg-4 col-md-6 category-card hover-lift" 
+           data-vault="{{ category.vault.name }}"
+           data-name="{{ category.name|lower }}"
+           data-parent="{% if category.parent %}{{ category.parent.name|lower }}{% else %}aucune{% endif %}"
+           style="transition: transform 0.3s ease;"
+           onmouseover="this.style.transform='translateY(-8px)'"
+           onmouseout="this.style.transform='translateY(0)'">
+        <div class="position-relative" style="
+          background: linear-gradient(135deg, rgba(18, 25, 53, 0.8), rgba(15, 21, 48, 0.8));
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 20px;
+          padding: 24px;
+          height: 100%;
+          backdrop-filter: blur(10px);
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          overflow: hidden;
+        "
+        onmouseover="this.style.borderColor='rgba(108, 140, 255, 0.3)'; this.style.boxShadow='0 20px 60px rgba(0, 0, 0, 0.4)'"
+        onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none'">
+          
+          <!-- Effet de fond -->
+          <div class="position-absolute top-0 end-0 w-100 h-100" style="
+            background: radial-gradient(circle at 80% 20%, rgba(108, 140, 255, 0.1) 0%, transparent 50%);
+            z-index: 0;
+          "></div>
+
+          <div class="position-relative z-1">
+            <!-- En-tête de la carte -->
+            <div class="d-flex align-items-center justify-content-between mb-4">
+              <div class="d-flex align-items-center gap-3">
+                <div style="
+                  width: 56px;
+                  height: 56px;
+                  background: {% if category.parent %}linear-gradient(135deg, var(--primary), var(--primary-600)){% else %}linear-gradient(135deg, var(--info), #2563eb){% endif %};
+                  border-radius: 16px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  position: relative;
+                  overflow: hidden;
+                  box-shadow: 0 8px 24px rgba(108, 140, 255, 0.4);
+                ">
+                  <i class="fas {% if category.parent %}fa-folder-open{% else %}fa-folder{% endif %}" style="color: white; font-size: 22px; z-index: 2;"></i>
+                  <div class="position-absolute w-100 h-100" style="
+                    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+                    animation: shine 3s infinite;
+                  "></div>
+                </div>
+                <div>
+                  <h4 style="margin: 0; color: white; font-size: 18px; font-weight: 600;">
+                    {{ category.name }}
+                  </h4>
+                  <p style="color: var(--muted); margin: 4px 0 0 0; font-size: 12px;">
+                    {% if category.parent %}
+                    Sous-catégorie de {{ category.parent.name }}
+                    {% else %}
+                    Catégorie racine
+                    {% endif %}
+                  </p>
+                </div>
+              </div>
+              
+              <!-- Menu dropdown -->
+              <div class="dropdown">
+                <button
+                  class="btn"
+                  type="button"
+                  id="dropdownCategory{{ category.id }}"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  style="
+                    padding: 8px;
+                    background: rgba(255, 255, 255, 0.05);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 12px;
+                    color: var(--text);
+                    width: 36px;
+                    height: 36px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                  "
+                  onmouseover="this.style.background='rgba(108, 140, 255, 0.1)'; this.style.borderColor='rgba(108, 140, 255, 0.3)'"
+                  onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'; this.style.borderColor='rgba(255, 255, 255, 0.1)'"
+                >
+                  <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <ul
+                  class="dropdown-menu dropdown-menu-dark"
+                  aria-labelledby="dropdownCategory{{ category.id }}"
+                  style="
+                    background: rgba(18, 25, 53, 0.95);
+                    backdrop-filter: blur(20px);
+                    border: 1px solid rgba(108, 140, 255, 0.2);
+                    border-radius: 16px;
+                    padding: 8px;
+                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+                    min-width: 200px;
+                  "
+                >
+                  <li>
+                    <a
+                      class="dropdown-item d-flex align-items-center"
+                      href="#"
+                      data-bs-toggle="modal"
+                      data-bs-target="#categoryUpdateModal{{ category.id }}"
+                      style="
+                        padding: 12px 16px;
+                        border-radius: 12px;
+                        transition: all 0.3s ease;
+                      "
+                      onmouseover="this.style.background='rgba(108, 140, 255, 0.1)'; this.style.transform='translateX(4px)'"
+                      onmouseout="this.style.background='transparent'; this.style.transform='translateX(0)'"
+                    >
+                      <i class="fas fa-edit me-3" style="width: 20px;"></i>
+                      <span>Modifier</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      class="dropdown-item d-flex align-items-center"
+                      href="#"
+                      data-bs-toggle="modal"
+                      data-bs-target="#categoryDeleteModal{{ category.id }}"
+                      style="
+                        padding: 12px 16px;
+                        border-radius: 12px;
+                        color: var(--danger);
+                        transition: all 0.3s ease;
+                      "
+                      onmouseover="this.style.background='rgba(239, 68, 68, 0.1)'; this.style.transform='translateX(4px)'"
+                      onmouseout="this.style.background='transparent'; this.style.transform='translateX(0)'"
+                    >
+                      <i class="fas fa-trash me-3" style="width: 20px;"></i>
+                      <span>Supprimer</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Informations de la catégorie -->
+            <div class="mb-4">
+              <div class="d-flex align-items-center gap-2 mb-3">
+                <i class="fas fa-lock" style="color: var(--muted); font-size: 14px;"></i>
+                <span style="
+                  background: rgba(108, 140, 255, 0.2);
+                  color: var(--primary);
+                  padding: 6px 12px;
+                  border-radius: 20px;
+                  font-size: 12px;
+                  font-weight: 600;
+                  border: 1px solid rgba(108, 140, 255, 0.3);
+                ">
+                  {{ category.vault.name }}
+                </span>
+              </div>
+
+              {% if category.parent %}
+              <div class="d-flex align-items-center gap-2 mb-3">
+                <i class="fas fa-folder" style="color: var(--muted); font-size: 14px;"></i>
+                <span style="
+                  background: rgba(59, 130, 246, 0.2);
+                  color: var(--info);
+                  padding: 6px 12px;
+                  border-radius: 20px;
+                  font-size: 12px;
+                  font-weight: 600;
+                  border: 1px solid rgba(59, 130, 246, 0.3);
+                ">
+                  {{ category.parent.name }}
+                </span>
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Statistiques de la catégorie -->
+            <div class="row text-center">
+              <div class="col-6">
+                <div class="border-end" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                  <div class="mb-1" style="color: white; font-size: 24px; font-weight: 700;">
+                    {{ category.credentials.count }}
+                  </div>
+                  <div style="color: var(--muted); font-size: 12px; font-weight: 600;">
+                    Identifiants
+                  </div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="mb-1" style="color: white; font-size: 24px; font-weight: 700;">
+                  {{ category.children.count }}
+                </div>
+                <div style="color: var(--muted); font-size: 12px; font-weight: 600;">
+                  Sous-catégories
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12">
+        <div class="text-center py-5" style="
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 20px;
+          backdrop-filter: blur(10px);
+        ">
+          <div class="mb-4" style="
+            width: 80px;
+            height: 80px;
+            background: rgba(108, 140, 255, 0.2);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+          ">
+            <i class="fas fa-folder-open" style="font-size: 32px; color: var(--primary);"></i>
+          </div>
+          <h3 class="mb-2" style="color: white;">Aucune catégorie trouvée</h3>
+          <p class="mb-4" style="color: var(--muted); max-width: 400px; margin: 0 auto;">
+            Créez votre première catégorie pour organiser vos identifiants
+          </p>
+          <button
+            class="btn hover-lift"
+            data-bs-toggle="modal"
+            data-bs-target="#categoryCreateModal"
+            style="
+              background: var(--gradient-primary);
+              color: white;
+              border: none;
+              padding: 12px 32px;
+              border-radius: 12px;
+              font-weight: 600;
+              font-size: 14px;
+              box-shadow: 0 8px 24px rgba(108, 140, 255, 0.4);
+              transition: all 0.3s ease;
+            "
+            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 32px rgba(108, 140, 255, 0.6)'"
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 24px rgba(108, 140, 255, 0.4)'"
+          >
+            <i class="fas fa-plus me-2"></i> Créer une catégorie
+          </button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Vue en liste des catégories (masquée par défaut) -->
+    <div id="categoriesList" class="d-none fade-in-up">
+      <div class="position-relative" style="
+        background: linear-gradient(135deg, rgba(18, 25, 53, 0.8), rgba(15, 21, 48, 0.8));
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 0;
+        backdrop-filter: blur(10px);
+        overflow: hidden;
+      ">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0" style="color: var(--text); border-color: rgba(255, 255, 255, 0.1);">
+            <thead style="
+              background: rgba(108, 140, 255, 0.1);
+              border-bottom: 2px solid rgba(108, 140, 255, 0.2);
+            ">
+              <tr>
+                <th style="padding: 20px; border: none;">Nom</th>
+                <th style="padding: 20px; border: none;">Coffre</th>
+                <th style="padding: 20px; border: none;">Parent</th>
+                <th style="padding: 20px; border: none;">Identifiants</th>
+                <th style="padding: 20px; border: none;">Sous-catégories</th>
+                <th style="padding: 20px; border: none;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for category in categories %}
+              <tr class="category-row" 
+                  data-vault="{{ category.vault.name }}"
+                  data-name="{{ category.name|lower }}"
+                  data-parent="{% if category.parent %}{{ category.parent.name|lower }}{% else %}aucune{% endif %}"
+                  style="
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                    transition: all 0.3s ease;
+                  "
+                  onmouseover="this.style.backgroundColor='rgba(108, 140, 255, 0.05)'"
+                  onmouseout="this.style.backgroundColor='transparent'">
+                <td style="padding: 20px;">
+                  <div class="d-flex align-items-center gap-3">
+                    <div style="
+                      width: 40px;
+                      height: 40px;
+                      background: {% if category.parent %}var(--gradient-primary){% else %}linear-gradient(135deg, var(--info), #2563eb){% endif %};
+                      border-radius: 12px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                    ">
+                      <i class="fas {% if category.parent %}fa-folder-open{% else %}fa-folder{% endif %}" style="color: white; font-size: 16px;"></i>
+                    </div>
+                    <div>
+                      <strong style="color: black; display: block;">{{ category.name }}</strong>
+                      <small style="color: var(--muted); font-size: 12px;">
+                        {% if category.parent %}
+                        Sous-catégorie de {{ category.parent.name }}
+                        {% else %}
+                        Catégorie racine
+                        {% endif %}
+                      </small>
+                    </div>
+                  </div>
+                </td>
+                <td style="padding: 20px;">
+                  <span style="
+                    background: rgba(108, 140, 255, 0.2);
+                    color: var(--primary);
+                    padding: 6px 12px;
+                    border-radius: 20px;
+                    font-size: 12px;
+                    font-weight: 600;
+                    border: 1px solid rgba(108, 140, 255, 0.3);
+                  ">
+                    {{ category.vault.name }}
+                  </span>
+                </td>
+                <td style="padding: 20px;">
+                  {% if category.parent %}
+                  <span style="
+                    background: rgba(59, 130, 246, 0.2);
+                    color: var(--info);
+                    padding: 6px 12px;
+                    border-radius: 20px;
+                    font-size: 12px;
+                    font-weight: 600;
+                    border: 1px solid rgba(59, 130, 246, 0.3);
+                  ">
+                    {{ category.parent.name }}
+                  </span>
+                  {% else %}
+                  <span style="color: var(--muted); font-size: 14px;">
+                    Racine
+                  </span>
+                  {% endif %}
+                </td>
+                <td style="padding: 20px;">
+                  <span style="
+                    background: rgba(34, 197, 94, 0.2);
+                    color: var(--success);
+                    padding: 8px 16px;
+                    border-radius: 20px;
+                    font-size: 14px;
+                    font-weight: 700;
+                    border: 1px solid rgba(34, 197, 94, 0.3);
+                    min-width: 40px;
+                    display: inline-block;
+                    text-align: center;
+                  ">
+                    {{ category.credentials.count }}
+                  </span>
+                </td>
+                <td style="padding: 20px;">
+                  <span style="
+                    background: rgba(245, 158, 11, 0.2);
+                    color: var(--warning);
+                    padding: 8px 16px;
+                    border-radius: 20px;
+                    font-size: 14px;
+                    font-weight: 700;
+                    border: 1px solid rgba(245, 158, 11, 0.3);
+                    min-width: 40px;
+                    display: inline-block;
+                    text-align: center;
+                  ">
+                    {{ category.children.count }}
+                  </span>
+                </td>
+                <td style="padding: 20px;">
+                  <div class="d-flex gap-2">
+                    <button 
+                      class="btn"
+                      data-bs-toggle="modal"
+                      data-bs-target="#categoryUpdateModal{{ category.id }}"
+                      style="
+                        padding: 8px 16px;
+                        background: rgba(255, 255, 255, 0.05);
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                        border-radius: 12px;
+                        color: gray;
+                        transition: all 0.3s ease;
+                      "
+                      onmouseover="this.style.background='rgba(108, 140, 255, 0.1)'; this.style.borderColor='rgba(108, 140, 255, 0.3)'"
+                      onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'; this.style.borderColor='rgba(255, 255, 255, 0.1)'"
+                    >
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button 
+                      class="btn"
+                      data-bs-toggle="modal"
+                      data-bs-target="#categoryDeleteModal{{ category.id }}"
+                      style="
+                        padding: 8px 16px;
+                        background: rgba(239, 68, 68, 0.1);
+                        border: 1px solid rgba(239, 68, 68, 0.3);
+                        border-radius: 12px;
+                        color: var(--danger);
+                        transition: all 0.3s ease;
+                      "
+                      onmouseover="this.style.background='rgba(239, 68, 68, 0.2)'; this.style.borderColor='rgba(239, 68, 68, 0.4)'"
+                      onmouseout="this.style.background='rgba(239, 68, 68, 0.1)'; this.style.borderColor='rgba(239, 68, 68, 0.3)'"
+                    >
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal de création -->
+<div class="modal fade" id="categoryCreateModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="
+      background: rgba(18, 25, 53, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(108, 140, 255, 0.2);
+      border-radius: 24px;
+      overflow: hidden;
+    ">
+      <div class="modal-header" style="
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 24px;
+      ">
+        <h5 class="modal-title d-flex align-items-center" style="color: white; font-weight: 600;">
+          <div style="
+            width: 36px;
+            height: 36px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+          ">
+            <i class="fas fa-plus-circle" style="color: white; font-size: 16px;"></i>
+          </div>
+          Créer une catégorie
+        </h5>
+        <button class="btn-close btn-close-white" data-bs-dismiss="modal" style="filter: brightness(0.8);"></button>
+      </div>
+      <div class="modal-body" style="padding: 24px;">
+        <form method="post" action="{% url 'category_create' %}">
+          {% csrf_token %}
+          <div class="mb-4">
+            <label class="form-label" style="color: var(--muted); font-size: 14px; font-weight: 600; margin-bottom: 8px;">
+              <i class="fas fa-lock me-1"></i> Coffre
+            </label>
+            <select 
+              name="vault"
+              class="form-control"
+              required
+              style="
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 16px;
+                color: var(--text);
+                padding: 12px 16px;
+                transition: all 0.3s ease;
+              "
+              onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 3px rgba(108, 140, 255, 0.1)'"
+              onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none'"
+            >
+              {% for vault in vaults %}
+              <option value="{{ vault.id }}">{{ vault.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label" style="color: var(--muted); font-size: 14px; font-weight: 600; margin-bottom: 8px;">
+              <i class="fas fa-tag me-1"></i> Nom de la catégorie
+            </label>
+            <input
+              type="text"
+              name="name"
+              class="form-control"
+              required
+              style="
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 16px;
+                color: var(--text);
+                padding: 12px 16px;
+                transition: all 0.3s ease;
+              "
+              onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 3px rgba(108, 140, 255, 0.1)'"
+              onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none'"
+            >
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label" style="color: var(--muted); font-size: 14px; font-weight: 600; margin-bottom: 8px;">
+              <i class="fas fa-folder me-1"></i> Catégorie parente (optionnel)
+            </label>
+            <select 
+              name="parent"
+              class="form-control"
+              style="
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 16px;
+                color: var(--text);
+                padding: 12px 16px;
+                transition: all 0.3s ease;
+              "
+              onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 3px rgba(108, 140, 255, 0.1)'"
+              onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none'"
+            >
+              <option value="">Sélectionnez une catégorie parente</option>
+              {% for cat in categories %}
+              <option value="{{ cat.id }}">{{ cat.name }} ({{ cat.vault.name }})</option>
+              {% endfor %}
+            </select>
+            <div class="form-text" style="color: var(--muted); margin-top: 8px; font-size: 12px;">
+              Laissez vide pour créer une catégorie racine
+            </div>
+          </div>
+
+          <div class="modal-footer" style="
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 24px 0 0 0;
+            margin-top: 24px;
+          ">
+            <button type="button" class="btn" data-bs-dismiss="modal" style="
+              background: rgba(255, 255, 255, 0.05);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              color: var(--text);
+              padding: 12px 24px;
+              border-radius: 12px;
+              font-weight: 600;
+              transition: all 0.3s ease;
+            "
+            onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.borderColor='rgba(255, 255, 255, 0.2)'"
+            onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'; this.style.borderColor='rgba(255, 255, 255, 0.1)'"
+            >
+              <i class="fas fa-times me-1"></i> Annuler
+            </button>
+            <button type="submit" class="btn" style="
+              background: var(--gradient-primary);
+              color: white;
+              border: none;
+              padding: 12px 24px;
+              border-radius: 12px;
+              font-weight: 600;
+              box-shadow: 0 8px 24px rgba(108, 140, 255, 0.4);
+              transition: all 0.3s ease;
+            "
+            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 32px rgba(108, 140, 255, 0.6)'"
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 24px rgba(108, 140, 255, 0.4)'"
+            >
+              <i class="fas fa-save me-1"></i> Créer la catégorie
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modales de modification et suppression pour chaque catégorie -->
+{% for category in categories %}
+<!-- Modal de modification -->
+<div class="modal fade" id="categoryUpdateModal{{ category.id }}" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="
+      background: rgba(18, 25, 53, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(108, 140, 255, 0.2);
+      border-radius: 24px;
+      overflow: hidden;
+    ">
+      <div class="modal-header" style="
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 24px;
+      ">
+        <h5 class="modal-title d-flex align-items-center" style="color: white; font-weight: 600;">
+          <div style="
+            width: 36px;
+            height: 36px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+          ">
+            <i class="fas fa-edit" style="color: white; font-size: 16px;"></i>
+          </div>
+          Modifier la catégorie
+        </h5>
+        <button class="btn-close btn-close-white" data-bs-dismiss="modal" style="filter: brightness(0.8);"></button>
+      </div>
+      <div class="modal-body" style="padding: 24px;">
+        <form method="post" action="{% url 'category_update' category.id %}">
+          {% csrf_token %}
+          <div class="mb-4">
+            <label class="form-label" style="color: var(--muted); font-size: 14px; font-weight: 600; margin-bottom: 8px;">
+              <i class="fas fa-lock me-1"></i> Coffre
+            </label>
+            <select 
+              name="vault"
+              class="form-control"
+              required
+              style="
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 16px;
+                color: var(--text);
+                padding: 12px 16px;
+                transition: all 0.3s ease;
+              "
+              onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 3px rgba(108, 140, 255, 0.1)'"
+              onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none'"
+            >
+              {% for vault in vaults %}
+              <option value="{{ vault.id }}" {% if vault.id == category.vault.id %}selected{% endif %}>
+                {{ vault.name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label" style="color: var(--muted); font-size: 14px; font-weight: 600; margin-bottom: 8px;">
+              <i class="fas fa-tag me-1"></i> Nom de la catégorie
+            </label>
+            <input
+              type="text"
+              name="name"
+              class="form-control"
+              value="{{ category.name }}"
+              required
+              style="
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 16px;
+                color: var(--text);
+                padding: 12px 16px;
+                transition: all 0.3s ease;
+              "
+              onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 3px rgba(108, 140, 255, 0.1)'"
+              onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none'"
+            >
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label" style="color: var(--muted); font-size: 14px; font-weight: 600; margin-bottom: 8px;">
+              <i class="fas fa-folder me-1"></i> Catégorie parente (optionnel)
+            </label>
+            <select 
+              name="parent"
+              class="form-control"
+              style="
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 16px;
+                color: var(--text);
+                padding: 12px 16px;
+                transition: all 0.3s ease;
+              "
+              onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 3px rgba(108, 140, 255, 0.1)'"
+              onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none'"
+            >
+              <option value="">Sélectionnez une catégorie parente</option>
+              {% for cat in categories %}
+                {% if cat.id != category.id %}
+                <option value="{{ cat.id }}" {% if category.parent and cat.id == category.parent.id %}selected{% endif %}>
+                  {{ cat.name }} ({{ cat.vault.name }})
+                </option>
+                {% endif %}
+              {% endfor %}
+            </select>
+            <div class="form-text" style="color: var(--muted); margin-top: 8px; font-size: 12px;">
+              Laissez vide pour créer une catégorie racine
+            </div>
+          </div>
+
+          <div class="modal-footer" style="
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 24px 0 0 0;
+            margin-top: 24px;
+          ">
+            <button type="button" class="btn" data-bs-dismiss="modal" style="
+              background: rgba(255, 255, 255, 0.05);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              color: var(--text);
+              padding: 12px 24px;
+              border-radius: 12px;
+              font-weight: 600;
+              transition: all 0.3s ease;
+            "
+            onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.borderColor='rgba(255, 255, 255, 0.2)'"
+            onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'; this.style.borderColor='rgba(255, 255, 255, 0.1)'"
+            >
+              <i class="fas fa-times me-1"></i> Annuler
+            </button>
+            <button type="submit" class="btn" style="
+              background: var(--gradient-primary);
+              color: white;
+              border: none;
+              padding: 12px 24px;
+              border-radius: 12px;
+              font-weight: 600;
+              box-shadow: 0 8px 24px rgba(108, 140, 255, 0.4);
+              transition: all 0.3s ease;
+            "
+            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 32px rgba(108, 140, 255, 0.6)'"
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 24px rgba(108, 140, 255, 0.4)'"
+            >
+              <i class="fas fa-save me-1"></i> Enregistrer
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de suppression -->
+<div class="modal fade" id="categoryDeleteModal{{ category.id }}" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="
+      background: rgba(18, 25, 53, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 24px;
+      overflow: hidden;
+    ">
+      <div class="modal-header" style="
+        border-bottom: 1px solid rgba(239, 68, 68, 0.3);
+        padding: 24px;
+        background: rgba(239, 68, 68, 0.1);
+      ">
+        <h5 class="modal-title d-flex align-items-center" style="color: white; font-weight: 600;">
+          <div style="
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+          ">
+            <i class="fas fa-exclamation-triangle" style="color: white; font-size: 16px;"></i>
+          </div>
+          Supprimer la catégorie
+        </h5>
+        <button class="btn-close btn-close-white" data-bs-dismiss="modal" style="filter: brightness(0.8);"></button>
+      </div>
+      <div class="modal-body" style="padding: 24px;">
+        <form method="post" action="{% url 'category_delete' category.id %}">
+          {% csrf_token %}
+          <div class="alert" role="alert" style="
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--danger);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 24px;
+          ">
+            <div class="d-flex align-items-start gap-3">
+              <i class="fas fa-exclamation-triangle mt-1" style="font-size: 18px;"></i>
+              <div>
+                <strong style="display: block; margin-bottom: 4px;">Attention !</strong>
+                Cette action est irréversible.
+              </div>
+            </div>
+          </div>
+          
+          <p style="color: white; margin-bottom: 20px;">
+            Êtes-vous sûr de vouloir supprimer la catégorie 
+            <strong style="color: var(--danger);">"{{ category.name }}"</strong> ?
+          </p>
+
+          {% if category.credentials.count > 0 %}
+          <div class="alert" role="alert" style="
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: var(--info);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+          ">
+            <div class="d-flex align-items-start gap-3">
+              <i class="fas fa-info-circle mt-1" style="font-size: 18px;"></i>
+              <div>
+                <strong style="display: block; margin-bottom: 4px;">Informations</strong>
+                Cette catégorie contient {{ category.credentials.count }} identifiant(s).
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          {% if category.children.count > 0 %}
+          <div class="alert" role="alert" style="
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: var(--warning);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+          ">
+            <div class="d-flex align-items-start gap-3">
+              <i class="fas fa-info-circle mt-1" style="font-size: 18px;"></i>
+              <div>
+                <strong style="display: block; margin-bottom: 4px;">Informations</strong>
+                Cette catégorie contient {{ category.children.count }} sous-catégorie(s).
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          <div class="modal-footer" style="
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 24px 0 0 0;
+            margin-top: 24px;
+          ">
+            <button type="button" class="btn" data-bs-dismiss="modal" style="
+              background: rgba(255, 255, 255, 0.05);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              color: var(--text);
+              padding: 12px 24px;
+              border-radius: 12px;
+              font-weight: 600;
+              transition: all 0.3s ease;
+            "
+            onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.borderColor='rgba(255, 255, 255, 0.2)'"
+            onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'; this.style.borderColor='rgba(255, 255, 255, 0.1)'"
+            >
+              <i class="fas fa-times me-1"></i> Annuler
+            </button>
+            <button type="submit" class="btn" style="
+              background: linear-gradient(135deg, var(--danger), #dc2626);
+              color: white;
+              border: none;
+              padding: 12px 24px;
+              border-radius: 12px;
+              font-weight: 600;
+              box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
+              transition: all 0.3s ease;
+            "
+            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 32px rgba(239, 68, 68, 0.6)'"
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 24px rgba(239, 68, 68, 0.4)'"
+            >
+              <i class="fas fa-trash me-1"></i> Supprimer définitivement
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+<script>
+  // Fonction pour filtrer les catégories
+  function filterCategories() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const vaultFilter = document.getElementById('vaultFilter').value;
+
+    // Filtrer les cartes (vue grille)
+    const cards = document.querySelectorAll('.category-card');
+    cards.forEach(card => {
+      const name = card.dataset.name || '';
+      const vault = card.dataset.vault || '';
+      const parent = card.dataset.parent || '';
+
+      const matchesSearch = name.includes(searchTerm) || parent.includes(searchTerm);
+      const matchesVault = !vaultFilter || vault === vaultFilter;
+
+      if (matchesSearch && matchesVault) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    // Filtrer les lignes (vue liste)
+    const rows = document.querySelectorAll('.category-row');
+    rows.forEach(row => {
+      const name = row.dataset.name || '';
+      const vault = row.dataset.vault || '';
+      const parent = row.dataset.parent || '';
+
+      const matchesSearch = name.includes(searchTerm) || parent.includes(searchTerm);
+      const matchesVault = !vaultFilter || vault === vaultFilter;
+
+      if (matchesSearch && matchesVault) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+
+  // Fonction pour basculer entre vue grille et liste
+  function toggleView(view) {
+    const gridView = document.getElementById('categoriesGrid');
+    const listView = document.getElementById('categoriesList');
+    const gridBtn = document.getElementById('gridViewBtn');
+    const listBtn = document.getElementById('listViewBtn');
+
+    if (view === 'grid') {
+      gridView.classList.remove('d-none');
+      listView.classList.add('d-none');
+      gridBtn.style.background = 'var(--gradient-primary)';
+      gridBtn.style.color = 'white';
+      gridBtn.style.borderColor = 'transparent';
+      listBtn.style.background = 'rgba(255, 255, 255, 0.05)';
+      listBtn.style.color = 'var(--text)';
+      listBtn.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+    } else {
+      gridView.classList.add('d-none');
+      listView.classList.remove('d-none');
+      gridBtn.style.background = 'rgba(108, 140, 255, 0.2)';
+      gridBtn.style.color = 'var(--primary)';
+      gridBtn.style.borderColor = 'rgba(108, 140, 255, 0.3)';
+      listBtn.style.background = 'var(--gradient-primary)';
+      listBtn.style.color = 'white';
+      listBtn.style.borderColor = 'transparent';
+    }
+  }
+
+  // Fonction pour afficher des notifications
+  function showNotification(message, type = 'info') {
+    const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle';
+    const bgColor = type === 'success' ? 'rgba(34, 197, 94, 0.1)' : 
+                    type === 'error' ? 'rgba(239, 68, 68, 0.1)' : 
+                    'rgba(59, 130, 246, 0.1)';
+    const borderColor = type === 'success' ? 'rgba(34, 197, 94, 0.3)' : 
+                       type === 'error' ? 'rgba(239, 68, 68, 0.3)' : 
+                       'rgba(59, 130, 246, 0.3)';
+    const textColor = type === 'success' ? 'var(--success)' : 
+                     type === 'error' ? 'var(--danger)' : 
+                     'var(--info)';
+
+    const notification = document.createElement('div');
+    notification.className = `fade-in-up`;
+    notification.style.cssText = `
+      position: fixed;
+      top: 100px;
+      right: 20px;
+      z-index: 9999;
+      min-width: 300px;
+      background: ${bgColor};
+      border: 1px solid ${borderColor};
+      border-radius: 16px;
+      padding: 16px;
+      color: ${textColor};
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    `;
+    notification.innerHTML = `
+      <i class="fas fa-${icon}" style="font-size: 18px;"></i>
+      <span>${message}</span>
+    `;
+
+    document.body.appendChild(notification);
+
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.remove();
+      }
+    }, 3000);
+  }
+
+  // Initialiser la vue grille par défaut
+  document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('gridViewBtn').style.background = 'var(--gradient-primary)';
+    document.getElementById('gridViewBtn').style.color = 'white';
+    document.getElementById('gridViewBtn').style.borderColor = 'transparent';
+  });
+</script>
+
+<style>
+  .fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes shine {
+    0%, 100% { transform: translateX(-100%); }
+    50% { transform: translateX(100%); }
+  }
+  
+  /* Style personnalisé pour les selects */
+  select.form-control {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%239aa3b2' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 16px;
+    padding-right: 48px !important;
+  }
+  
+  select.form-control:focus {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c8cff' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  }
+</style>
+{% endblock %}

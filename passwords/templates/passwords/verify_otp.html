@@ -1,0 +1,78 @@
+{% extends "passwords/base.html" %}
+
+{% block title %}Vérification OTP - Gestionnaire{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="panel fade-in-up" style="margin-top: 60px;">
+                <div style="text-align: center; margin-bottom: 32px;">
+                    <div
+                        style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary), var(--primary-600)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto;">
+                        <i class="fas fa-shield-alt" style="font-size: 32px; color: white;"></i>
+                    </div>
+                    <h2 style="margin: 0 0 8px 0; font-size: 28px;">Vérification de sécurité</h2>
+                    <p style="color: var(--muted); margin: 0;">Un code de vérification vous a été envoyé par email, Veuillez consulter votre boite mail</p>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        <label class="form-label"
+                            style="display: block; margin-bottom: 8px; font-weight: 500; color: var(--text);">
+                            <i class="fas fa-key" style="margin-right: 8px; color: var(--muted);"></i>
+                            Code de vérification
+                        </label>
+                        <input type="text" name="otp" id="otp" class="form-control"
+                            placeholder="Entrez le code à 6 chiffres" maxlength="6"
+                            style="text-align: center; font-size: 24px; letter-spacing: 8px; font-weight: 600;"
+                            required>
+                        <small style="color: var(--muted); font-size: 12px; margin-top: 4px; display: block;">
+                            Vérifiez votre boîte email et entrez le code reçu
+                        </small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary"
+                        style="width: 100%; padding: 14px; font-size: 16px; font-weight: 600;">
+                        <i class="fas fa-check-circle" style="margin-right: 8px;"></i>
+                        Vérifier le code
+                    </button>
+                </form>
+
+                <div
+                    style="text-align: center; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border);">
+                    <p style="color: var(--muted); margin: 0; font-size: 14px;">
+                        <i class="fas fa-clock" style="margin-right: 6px;"></i>
+                        Le code expire dans 10 minutes
+                    </p>
+                    <a href="{% url 'login' %}"
+                        style="color: var(--primary); text-decoration: none; font-weight: 500; font-size: 14px; margin-top: 8px; display: inline-block;">
+                        <i class="fas fa-arrow-left" style="margin-right: 4px;"></i>
+                        Retour à la connexion
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Auto-focus sur le champ OTP
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('otp').focus();
+    });
+
+    // Formatage automatique du code OTP
+    document.getElementById('otp').addEventListener('input', function (e) {
+        // Ne garder que les chiffres
+        this.value = this.value.replace(/[^0-9]/g, '');
+
+        // Limiter à 6 caractères
+        if (this.value.length > 6) {
+            this.value = this.value.slice(0, 6);
+        }
+    });
+</script>
+{% endblock %}

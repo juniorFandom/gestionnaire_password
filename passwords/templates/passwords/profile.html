@@ -1,0 +1,757 @@
+{% extends 'passwords/base.html' %}
+
+{% block title %}Profil - SecureVault{% endblock %}
+
+{% block content %}
+<div class="main-content">
+  <div class="container" style="max-width: 1280px; margin: 0 auto; padding: 0 24px;">
+    <div class="row">
+      <div class="col-lg-8">
+        <!-- En-tête du profil -->
+        <div class="fade-in-up" style="margin-top: 20px;">
+          <div class="position-relative" style="
+            background: linear-gradient(135deg, rgba(18, 25, 53, 0.8), rgba(15, 21, 48, 0.8));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 32px;
+            backdrop-filter: blur(20px);
+            margin-bottom: 24px;
+          ">
+            <div class="d-flex align-items-center gap-5">
+              <div class="position-relative">
+                <div style="
+                  width: 100px;
+                  height: 100px;
+                  background: var(--gradient-primary);
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  position: relative;
+                  overflow: hidden;
+                  box-shadow: 0 8px 32px rgba(108, 140, 255, 0.4);
+                ">
+                  <i class="fas fa-user" style="font-size: 40px; color: white; z-index: 2;"></i>
+                  <div class="position-absolute w-100 h-100" style="
+                    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+                    animation: shine 3s infinite;
+                  "></div>
+                </div>
+              </div>
+              <div>
+                <h1 class="mb-2" style="font-size: 32px; font-weight: 700; color: white;">
+                  <span class="gradient-text">{{ user.username }}</span>
+                </h1>
+                <p style="color: var(--muted); margin: 0 0 8px 0; font-size: 16px;">
+                  Membre depuis {{ user.date_joined|date:"F Y" }}
+                </p>
+                <div style="
+                  background: rgba(34, 197, 94, 0.1);
+                  border: 1px solid rgba(34, 197, 94, 0.3);
+                  color: var(--success);
+                  padding: 6px 16px;
+                  border-radius: 20px;
+                  font-size: 14px;
+                  font-weight: 600;
+                  display: inline-block;
+                ">
+                  <i class="fas fa-check-circle me-2"></i>
+                  Compte vérifié
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Informations personnelles -->
+          <div class="row g-4">
+            <div class="col-md-6">
+              <div class="position-relative hover-lift" style="
+                background: linear-gradient(135deg, rgba(18, 25, 53, 0.8), rgba(15, 21, 48, 0.8));
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 20px;
+                padding: 24px;
+                backdrop-filter: blur(10px);
+                transition: all 0.3s ease;
+                height: 100%;
+              "
+              onmouseover="this.style.borderColor='rgba(108, 140, 255, 0.3)'; this.style.transform='translateY(-4px)'"
+              onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.transform='translateY(0)'">
+                <h4 class="d-flex align-items-center gap-3 mb-4" style="color: white; font-size: 18px; font-weight: 600;">
+                  <div style="
+                    width: 40px;
+                    height: 40px;
+                    background: rgba(108, 140, 255, 0.2);
+                    border-radius: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  ">
+                    <i class="fas fa-user-circle" style="color: var(--primary); font-size: 18px;"></i>
+                  </div>
+                  Informations personnelles
+                </h4>
+                <div class="d-grid gap-4">
+                  <div>
+                    <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 6px;">
+                      <i class="fas fa-user me-2"></i>Nom d'utilisateur
+                    </div>
+                    <div style="color: white; font-size: 16px; font-weight: 600;">{{ user.username }}</div>
+                  </div>
+                  <div>
+                    <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 6px;">
+                      <i class="fas fa-envelope me-2"></i>Adresse email
+                    </div>
+                    <div style="color: white; font-size: 16px; font-weight: 600;">{{ user.email }}</div>
+                  </div>
+                  <div>
+                    <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 6px;">
+                      <i class="fas fa-calendar-plus me-2"></i>Compte créé le
+                    </div>
+                    <div style="color: white; font-size: 16px; font-weight: 600;">
+                      {{ user.date_joined|date:"d F Y à H:i" }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="position-relative hover-lift" style="
+                background: linear-gradient(135deg, rgba(18, 25, 53, 0.8), rgba(15, 21, 48, 0.8));
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 20px;
+                padding: 24px;
+                backdrop-filter: blur(10px);
+                transition: all 0.3s ease;
+                height: 100%;
+              "
+              onmouseover="this.style.borderColor='rgba(34, 197, 94, 0.3)'; this.style.transform='translateY(-4px)'"
+              onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.transform='translateY(0)'">
+                <h4 class="d-flex align-items-center gap-3 mb-4" style="color: white; font-size: 18px; font-weight: 600;">
+                  <div style="
+                    width: 40px;
+                    height: 40px;
+                    background: rgba(34, 197, 94, 0.2);
+                    border-radius: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  ">
+                    <i class="fas fa-shield-alt" style="color: var(--success); font-size: 18px;"></i>
+                  </div>
+                  Sécurité
+                </h4>
+                <div class="d-grid gap-4">
+                  <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                      <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 4px;">
+                        Authentification à 2 facteurs
+                      </div>
+                      <div style="color: white; font-size: 14px;">Recommandé pour plus de sécurité</div>
+                    </div>
+                    <button class="btn" onclick="toggle2FA()" style="
+                      background: rgba(108, 140, 255, 0.1);
+                      border: 1px solid rgba(108, 140, 255, 0.3);
+                      color: var(--primary);
+                      padding: 6px 16px;
+                      border-radius: 12px;
+                      font-size: 12px;
+                      font-weight: 600;
+                      transition: all 0.3s ease;
+                    "
+                    onmouseover="this.style.background='rgba(108, 140, 255, 0.2)'; this.style.borderColor='rgba(108, 140, 255, 0.4)'"
+                    onmouseout="this.style.background='rgba(108, 140, 255, 0.1)'; this.style.borderColor='rgba(108, 140, 255, 0.3)'">
+                      <i class="fas fa-toggle-on me-1"></i>Activer
+                    </button>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                      <div style="color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 4px;">
+                        Dernière connexion
+                      </div>
+                      <div style="color: white; font-size: 14px;">Aujourd'hui, {{ user.last_login|date:"H:i"|default:"Jamais" }}</div>
+                    </div>
+                    <div style="
+                      background: rgba(34, 197, 94, 0.1);
+                      color: var(--success);
+                      padding: 6px 12px;
+                      border-radius: 20px;
+                      font-size: 12px;
+                      font-weight: 600;
+                      border: 1px solid rgba(34, 197, 94, 0.3);
+                    ">
+                      <i class="fas fa-check-circle me-1"></i>Actif
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="position-relative hover-lift" style="
+            background: linear-gradient(135deg, rgba(18, 25, 53, 0.8), rgba(15, 21, 48, 0.8));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            margin-top: 24px;
+            transition: all 0.3s ease;
+          "
+          onmouseover="this.style.borderColor='rgba(108, 140, 255, 0.3)'; this.style.transform='translateY(-4px)'"
+          onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.transform='translateY(0)'">
+            <h4 class="d-flex align-items-center gap-3 mb-4" style="color: white; font-size: 18px; font-weight: 600;">
+              <div style="
+                width: 40px;
+                height: 40px;
+                background: rgba(108, 140, 255, 0.2);
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              ">
+                <i class="fas fa-cog" style="color: var(--primary); font-size: 18px;"></i>
+              </div>
+              Gestion du compte
+            </h4>
+            <div class="d-flex flex-column flex-md-row gap-3">
+              <button class="btn hover-lift" onclick="showChangePasswordModal()" style="
+                background: var(--gradient-primary);
+                color: white;
+                border: none;
+                padding: 14px 24px;
+                border-radius: 16px;
+                font-weight: 600;
+                font-size: 14px;
+                box-shadow: 0 8px 24px rgba(108, 140, 255, 0.4);
+                transition: all 0.3s ease;
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+              "
+              onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 32px rgba(108, 140, 255, 0.6)'"
+              onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 24px rgba(108, 140, 255, 0.4)'">
+                <i class="fas fa-key"></i>
+                Changer le mot de passe
+              </button>
+              
+              <button class="btn hover-lift" onclick="showEditProfileModal()" style="
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                color: var(--text);
+                padding: 14px 24px;
+                border-radius: 16px;
+                font-weight: 600;
+                font-size: 14px;
+                transition: all 0.3s ease;
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+              "
+              onmouseover="this.style.background='rgba(108, 140, 255, 0.1)'; this.style.borderColor='rgba(108, 140, 255, 0.3)'; this.style.transform='translateY(-2px)'"
+              onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'; this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.transform='translateY(0)'">
+                <i class="fas fa-edit"></i>
+                Modifier le profil
+              </button>
+              
+              <a href="{% url 'logout' %}" class="btn hover-lift" style="
+                background: rgba(239, 68, 68, 0.1);
+                border: 1px solid rgba(239, 68, 68, 0.3);
+                color: var(--danger);
+                padding: 14px 24px;
+                border-radius: 16px;
+                font-weight: 600;
+                font-size: 14px;
+                transition: all 0.3s ease;
+                text-decoration: none;
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+              "
+              onmouseover="this.style.background='rgba(239, 68, 68, 0.2)'; this.style.borderColor='rgba(239, 68, 68, 0.4)'; this.style.transform='translateY(-2px)'"
+              onmouseout="this.style.background='rgba(239, 68, 68, 0.1)'; this.style.borderColor='rgba(239, 68, 68, 0.3)'; this.style.transform='translateY(0)'">
+                <i class="fas fa-sign-out-alt"></i>
+                Se déconnecter
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <!-- Statistiques rapides -->
+        <div class="fade-in-up">
+          <div class="position-relative hover-lift" style="
+            background: linear-gradient(135deg, rgba(18, 25, 53, 0.8), rgba(15, 21, 48, 0.8));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
+          "
+          onmouseover="this.style.borderColor='rgba(108, 140, 255, 0.3)'; this.style.transform='translateY(-4px)'"
+          onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.transform='translateY(0)'">
+            <h4 class="d-flex align-items-center gap-3 mb-4" style="color: white; font-size: 18px; font-weight: 600;">
+              <div style="
+                width: 40px;
+                height: 40px;
+                background: rgba(108, 140, 255, 0.2);
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              ">
+                <i class="fas fa-chart-bar" style="color: var(--primary); font-size: 18px;"></i>
+              </div>
+              Statistiques
+            </h4>
+            <div class="d-grid gap-4">
+              <div class="d-flex align-items-center justify-content-between">
+                <div style="color: white; font-size: 14px;">
+                  <i class="fas fa-lock me-2" style="color: var(--primary);"></i>
+                  Coffres créés
+                </div>
+                <div style="
+                  background: rgba(108, 140, 255, 0.2);
+                  color: var(--primary);
+                  padding: 8px 16px;
+                  border-radius: 20px;
+                  font-size: 16px;
+                  font-weight: 700;
+                  border: 1px solid rgba(108, 140, 255, 0.3);
+                  min-width: 50px;
+                  text-align: center;
+                ">
+                  0
+                </div>
+              </div>
+              <div class="d-flex align-items-center justify-content-between">
+                <div style="color: white; font-size: 14px;">
+                  <i class="fas fa-key me-2" style="color: var(--success);"></i>
+                  Identifiants stockés
+                </div>
+                <div style="
+                  background: rgba(34, 197, 94, 0.2);
+                  color: var(--success);
+                  padding: 8px 16px;
+                  border-radius: 20px;
+                  font-size: 16px;
+                  font-weight: 700;
+                  border: 1px solid rgba(34, 197, 94, 0.3);
+                  min-width: 50px;
+                  text-align: center;
+                ">
+                  0
+                </div>
+              </div>
+              <div class="d-flex align-items-center justify-content-between">
+                <div style="color: white; font-size: 14px;">
+                  <i class="fas fa-folder me-2" style="color: var(--warning);"></i>
+                  Catégories
+                </div>
+                <div style="
+                  background: rgba(245, 158, 11, 0.2);
+                  color: var(--warning);
+                  padding: 8px 16px;
+                  border-radius: 20px;
+                  font-size: 16px;
+                  font-weight: 700;
+                  border: 1px solid rgba(245, 158, 11, 0.3);
+                  min-width: 50px;
+                  text-align: center;
+                ">
+                  0
+                </div>
+              </div>
+              <div class="d-flex align-items-center justify-content-between">
+                <div style="color: white; font-size: 14px;">
+                  <i class="fas fa-clock me-2" style="color: var(--info);"></i>
+                  Dernière activité
+                </div>
+                <div style="color: var(--muted); font-size: 14px; font-weight: 600;">
+                  Aujourd'hui
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Générateur de mots de passe -->
+          <div class="position-relative hover-lift" style="
+            background: linear-gradient(135deg, rgba(18, 25, 53, 0.8), rgba(15, 21, 48, 0.8));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+          "
+          onmouseover="this.style.borderColor='rgba(34, 197, 94, 0.3)'; this.style.transform='translateY(-4px)'"
+          onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.transform='translateY(0)'">
+            <h4 class="d-flex align-items-center gap-3 mb-4" style="color: white; font-size: 18px; font-weight: 600;">
+              <div style="
+                width: 40px;
+                height: 40px;
+                background: rgba(34, 197, 94, 0.2);
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              ">
+                <i class="fas fa-wand-magic-sparkles" style="color: var(--success); font-size: 18px;"></i>
+              </div>
+              Générateur de mot de passe
+            </h4>
+            <div class="mb-4">
+              <input
+                type="text"
+                id="generatedPassword"
+                readonly
+                style="
+                  width: 100%;
+                  background: rgba(255, 255, 255, 0.05);
+                  border: 1px solid rgba(255, 255, 255, 0.1);
+                  border-radius: 12px;
+                  color: white;
+                  padding: 12px 16px;
+                  font-family: 'Courier New', monospace;
+                  font-size: 16px;
+                  letter-spacing: 1px;
+                  text-align: center;
+                "
+                value="••••••••••"
+              />
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn hover-lift" onclick="generatePassword()" style="
+                background: rgba(34, 197, 94, 0.1);
+                border: 1px solid rgba(34, 197, 94, 0.3);
+                color: var(--success);
+                padding: 10px 20px;
+                border-radius: 12px;
+                font-weight: 600;
+                flex: 1;
+                transition: all 0.3s ease;
+              "
+              onmouseover="this.style.background='rgba(34, 197, 94, 0.2)'; this.style.borderColor='rgba(34, 197, 94, 0.4)'"
+              onmouseout="this.style.background='rgba(34, 197, 94, 0.1)'; this.style.borderColor='rgba(34, 197, 94, 0.3)'">
+                <i class="fas fa-sync-alt me-2"></i>Générer
+              </button>
+              <button class="btn hover-lift" onclick="copyPassword()" style="
+                background: rgba(108, 140, 255, 0.1);
+                border: 1px solid rgba(108, 140, 255, 0.3);
+                color: var(--primary);
+                padding: 10px 20px;
+                border-radius: 12px;
+                font-weight: 600;
+                flex: 1;
+                transition: all 0.3s ease;
+              "
+              onmouseover="this.style.background='rgba(108, 140, 255, 0.2)'; this.style.borderColor='rgba(108, 140, 255, 0.4)'"
+              onmouseout="this.style.background='rgba(108, 140, 255, 0.1)'; this.style.borderColor='rgba(108, 140, 255, 0.3)'">
+                <i class="fas fa-copy me-2"></i>Copier
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL STYLISÉ -->
+
+<!-- Modal de changement de mot de passe -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="
+      background: rgba(18, 25, 53, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(108, 140, 255, 0.2);
+      border-radius: 24px;
+      overflow: hidden;
+    ">
+      <div class="modal-header" style="
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 24px;
+      ">
+        <h5 class="modal-title d-flex align-items-center" style="color: white; font-weight: 600;">
+          <div style="
+            width: 36px;
+            height: 36px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+          ">
+            <i class="fas fa-key" style="color: white; font-size: 16px;"></i>
+          </div>
+          Changer le mot de passe
+        </h5>
+        <button class="btn-close btn-close-white" data-bs-dismiss="modal" style="filter: brightness(0.8);"></button>
+      </div>
+      <div class="modal-body" style="padding: 24px;">
+        <div class="mb-4">
+          <label class="form-label" style="color: var(--muted); font-size: 14px; font-weight: 600; margin-bottom: 8px;">
+            <i class="fas fa-lock me-2"></i> Mot de passe actuel
+          </label>
+          <input 
+            type="password" 
+            class="form-control" 
+            placeholder="Entrez votre mot de passe actuel"
+            style="
+              background: rgba(255, 255, 255, 0.05);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              border-radius: 16px;
+              color: var(--text);
+              padding: 12px 16px;
+              transition: all 0.3s ease;
+            "
+            onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 3px rgba(108, 140, 255, 0.1)'"
+            onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none'"
+          />
+        </div>
+        <div class="mb-4">
+          <label class="form-label" style="color: var(--muted); font-size: 14px; font-weight: 600; margin-bottom: 8px;">
+            <i class="fas fa-lock me-2"></i> Nouveau mot de passe
+          </label>
+          <input 
+            type="password" 
+            class="form-control" 
+            placeholder="Entrez votre nouveau mot de passe"
+            style="
+              background: rgba(255, 255, 255, 0.05);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              border-radius: 16px;
+              color: var(--text);
+              padding: 12px 16px;
+              transition: all 0.3s ease;
+            "
+            onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 3px rgba(108, 140, 255, 0.1)'"
+            onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none'"
+          />
+        </div>
+        <div class="mb-4">
+          <label class="form-label" style="color: var(--muted); font-size: 14px; font-weight: 600; margin-bottom: 8px;">
+            <i class="fas fa-lock me-2"></i> Confirmer le nouveau mot de passe
+          </label>
+          <input 
+            type="password" 
+            class="form-control" 
+            placeholder="Confirmez votre nouveau mot de passe"
+            style="
+              background: rgba(255, 255, 255, 0.05);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              border-radius: 16px;
+              color: var(--text);
+              padding: 12px 16px;
+              transition: all 0.3s ease;
+            "
+            onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 3px rgba(108, 140, 255, 0.1)'"
+            onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none'"
+          />
+        </div>
+      </div>
+      <div class="modal-footer" style="
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 24px;
+      ">
+        <button class="btn" data-bs-dismiss="modal" style="
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          color: var(--text);
+          padding: 12px 24px;
+          border-radius: 12px;
+          font-weight: 600;
+          transition: all 0.3s ease;
+        "
+        onmouseover="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.borderColor='rgba(255, 255, 255, 0.2)'"
+        onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'; this.style.borderColor='rgba(255, 255, 255, 0.1)'">
+          Annuler
+        </button>
+        <button class="btn" style="
+          background: var(--gradient-primary);
+          color: white;
+          border: none;
+          padding: 12px 24px;
+          border-radius: 12px;
+          font-weight: 600;
+          box-shadow: 0 8px 24px rgba(108, 140, 255, 0.4);
+          transition: all 0.3s ease;
+        "
+        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 32px rgba(108, 140, 255, 0.6)'"
+        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 24px rgba(108, 140, 255, 0.4)'">
+          <i class="fas fa-save me-2"></i>
+          Changer le mot de passe
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showChangePasswordModal() {
+    const modal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
+    modal.show();
+  }
+
+  function showEditProfileModal() {
+    alert('Fonctionnalité en cours de développement');
+  }
+
+  function toggle2FA() {
+    const button = event.target.closest('button');
+    const isActive = button.textContent.includes('Activer');
+    
+    if (isActive) {
+      button.innerHTML = '<i class="fas fa-toggle-off me-1"></i>Désactiver';
+      button.style.background = 'rgba(239, 68, 68, 0.1)';
+      button.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+      button.style.color = 'var(--danger)';
+      showAlert('Authentification à 2 facteurs activée', 'success');
+    } else {
+      button.innerHTML = '<i class="fas fa-toggle-on me-1"></i>Activer';
+      button.style.background = 'rgba(108, 140, 255, 0.1)';
+      button.style.borderColor = 'rgba(108, 140, 255, 0.3)';
+      button.style.color = 'var(--primary)';
+      showAlert('Authentification à 2 facteurs désactivée', 'warning');
+    }
+  }
+
+  function generatePassword() {
+    const length = 16;
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?";
+    let password = "";
+    
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * charset.length);
+      password += charset[randomIndex];
+    }
+    
+    document.getElementById('generatedPassword').value = password;
+    showAlert('Nouveau mot de passe généré', 'success');
+  }
+
+  function copyPassword() {
+    const passwordField = document.getElementById('generatedPassword');
+    passwordField.select();
+    passwordField.setSelectionRange(0, 99999); // Pour mobile
+    
+    navigator.clipboard.writeText(passwordField.value).then(() => {
+      showAlert('Mot de passe copié dans le presse-papier', 'success');
+    }).catch(err => {
+      console.error('Erreur lors de la copie:', err);
+      showAlert('Erreur lors de la copie', 'danger');
+    });
+  }
+
+  function showAlert(message, type) {
+    const colors = {
+      'success': { bg: 'rgba(34, 197, 94, 0.1)', border: 'rgba(34, 197, 94, 0.3)', text: 'var(--success)' },
+      'danger': { bg: 'rgba(239, 68, 68, 0.1)', border: 'rgba(239, 68, 68, 0.3)', text: 'var(--danger)' },
+      'warning': { bg: 'rgba(245, 158, 11, 0.1)', border: 'rgba(245, 158, 11, 0.3)', text: 'var(--warning)' }
+    };
+    
+    const color = colors[type] || colors.success;
+    const icon = type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : 'exclamation-triangle';
+    
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'fade-in-up';
+    alertDiv.style.cssText = `
+      position: fixed;
+      top: 100px;
+      right: 20px;
+      z-index: 9999;
+      min-width: 300px;
+      background: ${color.bg};
+      border: 1px solid ${color.border};
+      border-radius: 16px;
+      padding: 16px;
+      color: ${color.text};
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: slideDown 0.3s ease-out;
+    `;
+    alertDiv.innerHTML = `
+      <i class="fas fa-${icon}" style="font-size: 18px;"></i>
+      <span>${message}</span>
+    `;
+    
+    document.body.appendChild(alertDiv);
+    
+    setTimeout(() => {
+      alertDiv.remove();
+    }, 3000);
+  }
+</script>
+
+<style>
+  .fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideDown {
+    from {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes shine {
+    0%, 100% { transform: translateX(-100%); }
+    50% { transform: translateX(100%); }
+  }
+
+  .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .d-flex.flex-md-row {
+      flex-direction: column;
+    }
+    
+    .position-relative {
+      padding: 20px !important;
+    }
+    
+    .d-flex.gap-5 {
+      gap: 24px !important;
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+</style>
+{% endblock %}

@@ -1,0 +1,1464 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    {% load static %}
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Gestionnaire{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}"
+    />
+    <link
+      rel="stylesheet"
+      href="{% static 'vendor/fontawesome/css/all.min.css' %}"
+    />
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'vendor/js/jquery.js' %}"></script>
+    <style>
+      :root {
+        --bg: #0b1020;
+        --panel: #121935;
+        --panel-2: #0f1530;
+        --text: #fefeff;
+        --muted: #9aa3b2;
+        --primary: #6c8cff;
+        --primary-600: #5779ff;
+        --primary-700: #4768ff;
+        --ring: rgba(108, 140, 255, 0.45);
+        --border: #253056;
+        --success: #22c55e;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #3b82f6;
+        --glass: rgba(255, 255, 255, 0.05);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --gradient-primary: linear-gradient(135deg, #6c8cff, #4768ff);
+        --gradient-hover: linear-gradient(135deg, #5779ff, #3a56ff);
+        --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.4);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(
+            1200px 800px at 10% -10%,
+            #1a2552 0%,
+            transparent 60%
+          ),
+          radial-gradient(
+            1000px 700px at 110% 10%,
+            #1a2552 0%,
+            transparent 60%
+          ),
+          linear-gradient(180deg, #0a0f22 0%, #0b1020 100%);
+        min-height: 100vh;
+      }
+
+      /* ============ HEADER STYLES ============ */
+      .nav-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        backdrop-filter: saturate(180%) blur(20px);
+        background: rgba(11, 16, 32, 0.85);
+        border-bottom: 1px solid rgba(37, 48, 86, 0.6);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .nav-header.scrolled {
+        background: rgba(11, 16, 32, 0.95);
+        border-bottom-color: rgba(108, 140, 255, 0.2);
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+      }
+
+      .nav-container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 70px;
+      }
+
+      /* ============ BRAND/LOGO ============ */
+      .brand-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .logo-container {
+        position: relative;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .logo-orb {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: var(--gradient-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow:
+          0 8px 32px rgba(108, 140, 255, 0.4),
+          inset 0 1px 1px rgba(255, 255, 255, 0.2);
+      }
+
+      .logo-orb::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at 30% 30%,
+          rgba(255, 255, 255, 0.2) 0%,
+          transparent 60%
+        );
+        border-radius: 12px;
+      }
+
+      .logo-orb::after {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          135deg,
+          transparent 30%,
+          rgba(255, 255, 255, 0.1) 50%,
+          transparent 70%
+        );
+        animation: shine 3s infinite;
+      }
+
+      @keyframes shine {
+        0%,
+        100% {
+          transform: translateX(-100%);
+        }
+        50% {
+          transform: translateX(100%);
+        }
+      }
+
+      .logo-icon {
+        font-size: 18px;
+        color: white;
+        z-index: 2;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+      }
+
+      .brand-text {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .brand-title {
+        font-weight: 700;
+        font-size: 18px;
+        letter-spacing: -0.02em;
+        background: linear-gradient(135deg, #fff, #a8baff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .brand-subtitle {
+        font-size: 11px;
+        color: var(--muted);
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        margin-top: 2px;
+      }
+
+      /* ============ NAVIGATION ============ */
+      .nav-main {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex: 1;
+        justify-content: center;
+        margin: 0 32px;
+      }
+
+      .nav-item {
+        position: relative;
+        list-style: none;
+      }
+
+      .nav-link {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 20px;
+        color: var(--muted);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 14px;
+        border-radius: 12px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid transparent;
+        background: transparent;
+      }
+
+      .nav-link:hover {
+        color: var(--text);
+        background: rgba(108, 140, 255, 0.1);
+        border-color: rgba(108, 140, 255, 0.3);
+        transform: translateY(-2px);
+      }
+
+      .nav-link.active {
+        color: white;
+        background: var(--gradient-primary);
+        border-color: transparent;
+        box-shadow: 0 8px 24px rgba(108, 140, 255, 0.4);
+        transform: translateY(-2px);
+      }
+
+      .nav-link.active .nav-icon {
+        transform: scale(1.1);
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+      }
+
+      .nav-icon {
+        font-size: 16px;
+        transition: transform 0.3s ease;
+      }
+
+      .nav-indicator {
+        position: absolute;
+        bottom: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 24px;
+        height: 3px;
+        background: var(--gradient-primary);
+        border-radius: 2px;
+        opacity: 0;
+        transition: all 0.3s ease;
+      }
+
+      .nav-link:hover .nav-indicator,
+      .nav-link.active .nav-indicator {
+        opacity: 1;
+        bottom: -6px;
+      }
+
+      /* ============ DROPDOWN MENUS ============ */
+      .dropdown-wrapper {
+        position: relative;
+      }
+
+      .dropdown-wrapper .dropdown-menu {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        min-width: 240px;
+        background: rgba(18, 25, 53, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(108, 140, 255, 0.2);
+        border-radius: 16px;
+        padding: 8px;
+        box-shadow: var(--shadow-lg);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1001;
+        overflow: hidden;
+        display: block !important;
+      }
+
+      .dropdown-wrapper:hover .dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .dropdown-wrapper .dropdown-menu::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(108, 140, 255, 0.5),
+          transparent
+        );
+      }
+
+      .dropdown-wrapper .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        color: var(--text);
+        text-decoration: none;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        border: none;
+        background: transparent;
+        width: 100%;
+      }
+
+      .dropdown-wrapper .dropdown-item::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 3px;
+        background: var(--gradient-primary);
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
+      }
+
+      .dropdown-wrapper .dropdown-item:hover {
+        background: rgba(108, 140, 255, 0.1);
+        transform: translateX(4px);
+        color: var(--text);
+      }
+
+      .dropdown-wrapper .dropdown-item:hover::before {
+        transform: scaleY(1);
+      }
+
+      .dropdown-wrapper .dropdown-item i {
+        width: 20px;
+        text-align: center;
+        font-size: 14px;
+        color: var(--primary);
+      }
+
+      .dropdown-wrapper .dropdown-divider {
+        height: 1px;
+        background: rgba(255, 255, 255, 0.1);
+        margin: 8px 0;
+        border: none;
+      }
+
+      .dropdown-wrapper .dropdown-badge {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--gradient-primary);
+        color: white;
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-weight: 600;
+      }
+
+      /* ============ USER MENU ============ */
+      .user-menu {
+        margin-left: auto;
+      }
+
+      .user-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: var(--gradient-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 18px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .user-avatar:hover {
+        transform: scale(1.05);
+        border-color: rgba(108, 140, 255, 0.5);
+        box-shadow: 0 8px 24px rgba(108, 140, 255, 0.4);
+      }
+
+      .user-avatar::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          45deg,
+          transparent 30%,
+          rgba(255, 255, 255, 0.1) 50%,
+          transparent 70%
+        );
+        animation: shine 3s infinite;
+      }
+
+      .user-dropdown {
+        right: 0;
+        left: auto;
+        min-width: 280px;
+      }
+
+      .user-info {
+        padding: 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .user-details {
+        flex: 1;
+      }
+
+      .user-name {
+        font-weight: 600;
+        font-size: 16px;
+        margin-bottom: 4px;
+      }
+
+      .user-email {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      /* ============ MOBILE TOGGLE ============ */
+      .mobile-toggle {
+        display: none;
+        background: none;
+        border: none;
+        color: var(--text);
+        font-size: 24px;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        z-index: 1002;
+      }
+
+      .mobile-toggle:hover {
+        background: rgba(108, 140, 255, 0.1);
+      }
+
+      /* ============ SIDEBAR MOBILE ============ */
+      .mobile-sidebar {
+        position: fixed;
+        top: 0;
+        left: -300px;
+        width: 300px;
+        height: 100vh;
+        background: rgba(11, 16, 32, 0.98);
+        backdrop-filter: blur(20px);
+        border-right: 1px solid rgba(108, 140, 255, 0.2);
+        z-index: 1100;
+        padding: 20px;
+        overflow-y: auto;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 4px 0 40px rgba(0, 0, 0, 0.5);
+      }
+
+      .mobile-sidebar.active {
+        transform: translateX(300px);
+      }
+
+      .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        z-index: 1099;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .sidebar-overlay.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .sidebar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .sidebar-close {
+        background: none;
+        border: none;
+        color: var(--text);
+        font-size: 20px;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+      }
+
+      .sidebar-close:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .sidebar-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .sidebar-nav .nav-item {
+        margin-bottom: 4px;
+      }
+
+      .sidebar-nav .nav-link {
+        padding: 16px 20px;
+        font-size: 16px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.05);
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .sidebar-nav .dropdown-wrapper {
+        width: 100%;
+      }
+
+      .sidebar-nav .dropdown-menu {
+        position: static;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        padding: 8px 0 8px 20px;
+        margin-top: 8px;
+        width: 100%;
+      }
+
+      .sidebar-nav .dropdown-item {
+        padding: 12px 16px;
+        font-size: 14px;
+        width: 100%;
+      }
+
+      .sidebar-nav .dropdown-item:hover {
+        background: rgba(108, 140, 255, 0.1);
+      }
+
+      /* ============ RESPONSIVE ============ */
+      @media (min-width: 1025px) {
+        .nav-main {
+          display: flex !important;
+        }
+        .mobile-toggle {
+          display: none !important;
+        }
+        .mobile-sidebar {
+          display: none !important;
+        }
+      }
+
+      @media (max-width: 1024px) and (min-width: 769px) {
+        .nav-main {
+          display: flex !important;
+          gap: 2px;
+          margin: 0 16px;
+        }
+
+        .nav-link {
+          padding: 10px 14px;
+          font-size: 13px;
+        }
+
+        .mobile-toggle {
+          display: none !important;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .nav-main {
+          display: none !important;
+        }
+
+        .mobile-toggle {
+          display: block !important;
+        }
+
+        .user-menu .user-dropdown {
+          position: fixed;
+          top: 80px;
+          right: 20px;
+          left: auto;
+          min-width: 280px;
+        }
+
+        .nav-container {
+          padding: 0 16px;
+        }
+
+        .brand-title {
+          font-size: 16px;
+        }
+
+        .brand-subtitle {
+          font-size: 10px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .mobile-sidebar {
+          width: 280px;
+          left: -280px;
+        }
+
+        .mobile-sidebar.active {
+          transform: translateX(280px);
+        }
+
+        .user-avatar {
+          width: 40px;
+          height: 40px;
+          font-size: 16px;
+        }
+      }
+
+      /* ============ ANIMATIONS ============ */
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-5px);
+        }
+      }
+
+      .logo-orb:hover {
+        animation: float 2s ease-in-out infinite;
+      }
+
+      /* ============ UTILITY CLASSES ============ */
+      .gradient-text {
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .hover-lift {
+        transition: transform 0.3s ease;
+      }
+
+      .hover-lift:hover {
+        transform: translateY(-2px);
+      }
+
+      /* ============ MAIN CONTENT ============ */
+      .main-content {
+        padding-top: 90px;
+        min-height: calc(100vh - 100px);
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Header avec navigation horizontale -->
+    <header class="nav-header" id="navHeader">
+      <div class="nav-container">
+        <!-- Brand/Logo -->
+        <div class="brand-wrapper">
+          <div class="logo-container">
+            <div class="logo-orb hover-lift">
+              <i class="fas fa-lock logo-icon"></i>
+            </div>
+          </div>
+          <div class="brand-text">
+            <div class="brand-title">SecureVault</div>
+            <div class="brand-subtitle">Password Manager</div>
+          </div>
+        </div>
+
+        <!-- Navigation Desktop -->
+        <ul class="nav-main" id="desktopNav">
+          {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a href="{% url 'home' %}" class="nav-link" id="navHome">
+              <i class="fas fa-home nav-icon"></i>
+              <span>Accueil</span>
+              <div class="nav-indicator"></div>
+            </a>
+          </li>
+
+          <li class="nav-item dropdown-wrapper">
+            <a href="{% url 'vault_list' %}" class="nav-link" id="navVaults">
+              <i class="fas fa-lock nav-icon"></i>
+              <span>Coffres</span>
+              <div class="nav-indicator"></div>
+            </a>
+            <div class="dropdown-menu">
+              <a href="{% url 'vault_list' %}" class="dropdown-item">
+                <i class="fas fa-list"></i>
+                <span>Liste des coffres</span>
+              </a>
+              <a href="{% url 'vault_create' %}" class="dropdown-item">
+                <i class="fas fa-plus"></i>
+                <span>Ajouter un coffre</span>
+              </a>
+            </div>
+          </li>
+
+          <li class="nav-item dropdown-wrapper">
+            <a
+              href="{% url 'category_list' %}"
+              class="nav-link"
+              id="navCategories"
+            >
+              <i class="fas fa-folder nav-icon"></i>
+              <span>Catégories</span>
+              <div class="nav-indicator"></div>
+            </a>
+            <div class="dropdown-menu">
+              <a href="{% url 'category_list' %}" class="dropdown-item">
+                <i class="fas fa-list"></i>
+                <span>Liste des catégories</span>
+              </a>
+              <a href="{% url 'category_create' %}" class="dropdown-item">
+                <i class="fas fa-plus"></i>
+                <span>Ajouter une catégorie</span>
+              </a>
+            </div>
+          </li>
+
+          <li class="nav-item dropdown-wrapper">
+            <a
+              href="{% url 'credential_list' %}"
+              class="nav-link"
+              id="navCredentials"
+            >
+              <i class="fas fa-key nav-icon"></i>
+              <span>Identifiants</span>
+              <div class="nav-indicator"></div>
+            </a>
+            <div class="dropdown-menu">
+              <a href="{% url 'credential_list' %}" class="dropdown-item">
+                <i class="fas fa-list"></i>
+                <span>Liste des identifiants</span>
+              </a>
+              <a href="{% url 'credential_create' %}" class="dropdown-item">
+                <i class="fas fa-plus"></i>
+                <span>Ajouter un identifiant</span>
+              </a>
+            </div>
+          </li>
+
+          <li class="nav-item">
+            <a href="{% url 'audit_log' %}" class="nav-link" id="navHistory">
+              <i class="fas fa-history nav-icon"></i>
+              <span>Historique</span>
+              <div class="nav-indicator"></div>
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+
+        <!-- User Menu / Auth -->
+        {% if user.is_authenticated %}
+        <div class="user-menu dropdown-wrapper">
+          <div class="user-avatar hover-lift" id="userAvatar">
+            {{ user.username|first|upper }}
+          </div>
+          <div class="dropdown-menu user-dropdown">
+            <div class="user-info">
+              <div class="user-avatar" style="width: 48px; height: 48px">
+                {{ user.username|first|upper }}
+              </div>
+              <div class="user-details">
+                <div class="user-name">{{ user.username }}</div>
+                <div class="user-email">
+                  {{ user.email|default:"No email" }}
+                </div>
+              </div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <a href="{% url 'profile' %}" class="dropdown-item">
+              <i class="fas fa-user"></i>
+              <span>Mon profil</span>
+            </a>
+            <a href="#" class="dropdown-item">
+              <i class="fas fa-cog"></i>
+              <span>Paramètres</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="{% url 'logout' %}" class="dropdown-item">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>Déconnexion</span>
+            </a>
+          </div>
+        </div>
+        <!-- Dans base.html, juste avant la fermeture de la navbar -->
+        {% if request.session.open_vault_id %}
+        <div class="position-relative me-3" id="openVaultIndicator">
+          <div
+            class="d-flex align-items-center gap-2 px-3 py-2"
+            style="
+              background: linear-gradient(
+                135deg,
+                rgba(108, 140, 255, 0.2),
+                rgba(34, 197, 94, 0.2)
+              );
+              border: 1px solid rgba(108, 140, 255, 0.3);
+              border-radius: 30px;
+              backdrop-filter: blur(10px);
+              animation: pulse 2s infinite;
+            "
+          >
+            <div
+              style="
+                width: 10px;
+                height: 10px;
+                background: var(--success);
+                border-radius: 50%;
+                box-shadow: 0 0 10px var(--success);
+              "
+            ></div>
+            <span style="color: white; font-size: 14px; font-weight: 600">
+              Coffre ouvert:
+              <span id="openVaultName"
+                >{{ request.session.open_vault_name }}</span
+              >
+            </span>
+            <span
+              id="vaultTimer"
+              style="
+                background: rgba(0, 0, 0, 0.3);
+                padding: 2px 8px;
+                border-radius: 20px;
+                font-size: 12px;
+                color: var(--muted);
+              "
+              >10:00</span
+            >
+            <button
+              onclick="closeVault()"
+              style="
+                background: rgba(255, 255, 255, 0.1);
+                border: none;
+                color: var(--muted);
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.3s ease;
+              "
+              onmouseover="
+                this.style.background = 'rgba(239,68,68,0.3)';
+                this.style.color = 'white';
+              "
+              onmouseout="
+                this.style.background = 'rgba(255,255,255,0.1)';
+                this.style.color = 'var(--muted)';
+              "
+            >
+              <i class="fas fa-times" style="font-size: 12px"></i>
+            </button>
+          </div>
+        </div>
+        {% endif %} {% else %}
+        <div class="auth-buttons">
+          <a
+            href="{% url 'login' %}"
+            class="nav-link"
+            style="margin-right: 8px"
+          >
+            <i class="fas fa-sign-in-alt"></i>
+            <span>Connexion</span>
+          </a>
+          <a href="{% url 'register' %}" class="nav-link active">
+            <i class="fas fa-user-plus"></i>
+            <span>Inscription</span>
+          </a>
+        </div>
+        {% endif %}
+
+        <!-- Bouton Menu Mobile -->
+        <button class="mobile-toggle" id="mobileToggle">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Sidebar Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="mobile-sidebar" id="mobileSidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="logo-orb" style="width: 36px; height: 36px">
+            <i class="fas fa-lock logo-icon" style="font-size: 16px"></i>
+          </div>
+          <div class="brand-text">
+            <div class="brand-title">SecureVault</div>
+            <div class="brand-subtitle">Menu</div>
+          </div>
+        </div>
+        <button class="sidebar-close" id="sidebarClose">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="sidebar-nav">
+        {% if user.is_authenticated %}
+        <div class="nav-item">
+          <a href="{% url 'home' %}" class="nav-link">
+            <i class="fas fa-home nav-icon"></i>
+            <span>Accueil</span>
+          </a>
+        </div>
+
+        <div class="nav-item dropdown-wrapper">
+          <a href="{% url 'vault_list' %}" class="nav-link">
+            <i class="fas fa-lock nav-icon"></i>
+            <span>Coffres</span>
+            <i
+              class="fas fa-chevron-down"
+              style="margin-left: auto; font-size: 12px"
+            ></i>
+          </a>
+          <div class="dropdown-menu">
+            <a href="{% url 'vault_list' %}" class="dropdown-item">
+              <i class="fas fa-list"></i>
+              <span>Liste des coffres</span>
+            </a>
+            <a href="{% url 'vault_create' %}" class="dropdown-item">
+              <i class="fas fa-plus"></i>
+              <span>Ajouter un coffre</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="nav-item dropdown-wrapper">
+          <a href="{% url 'category_list' %}" class="nav-link">
+            <i class="fas fa-folder nav-icon"></i>
+            <span>Catégories</span>
+            <i
+              class="fas fa-chevron-down"
+              style="margin-left: auto; font-size: 12px"
+            ></i>
+          </a>
+          <div class="dropdown-menu">
+            <a href="{% url 'category_list' %}" class="dropdown-item">
+              <i class="fas fa-list"></i>
+              <span>Liste des catégories</span>
+            </a>
+            <a href="{% url 'category_create' %}" class="dropdown-item">
+              <i class="fas fa-plus"></i>
+              <span>Ajouter une catégorie</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="nav-item dropdown-wrapper">
+          <a href="{% url 'credential_list' %}" class="nav-link">
+            <i class="fas fa-key nav-icon"></i>
+            <span>Identifiants</span>
+            <i
+              class="fas fa-chevron-down"
+              style="margin-left: auto; font-size: 12px"
+            ></i>
+          </a>
+          <div class="dropdown-menu">
+            <a href="{% url 'credential_list' %}" class="dropdown-item">
+              <i class="fas fa-list"></i>
+              <span>Liste des identifiants</span>
+            </a>
+            <a href="{% url 'credential_create' %}" class="dropdown-item">
+              <i class="fas fa-plus"></i>
+              <span>Ajouter un identifiant</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="nav-item">
+          <a href="{% url 'audit_log' %}" class="nav-link">
+            <i class="fas fa-history nav-icon"></i>
+            <span>Historique</span>
+          </a>
+        </div>
+
+        <div class="dropdown-divider"></div>
+
+        <div class="nav-item">
+          <a href="{% url 'profile' %}" class="nav-link">
+            <i class="fas fa-user nav-icon"></i>
+            <span>Mon profil</span>
+          </a>
+        </div>
+
+        <div class="nav-item">
+          <a href="#" class="nav-link">
+            <i class="fas fa-cog nav-icon"></i>
+            <span>Paramètres</span>
+          </a>
+        </div>
+
+        <div class="nav-item">
+          <a
+            href="{% url 'logout' %}"
+            class="nav-link"
+            style="color: var(--danger)"
+          >
+            <i class="fas fa-sign-out-alt nav-icon"></i>
+            <span>Déconnexion</span>
+          </a>
+        </div>
+        {% else %}
+        <div class="nav-item">
+          <a href="{% url 'login' %}" class="nav-link">
+            <i class="fas fa-sign-in-alt nav-icon"></i>
+            <span>Connexion</span>
+          </a>
+        </div>
+        <div class="nav-item">
+          <a href="{% url 'register' %}" class="nav-link active">
+            <i class="fas fa-user-plus nav-icon"></i>
+            <span>Inscription</span>
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div
+        class="container"
+        style="max-width: 1280px; margin: 0 auto; padding: 0 24px"
+      >
+        {% block content %} {% endblock %}
+      </div>
+    </main>
+
+    <!-- Scripts -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const navHeader = document.getElementById("navHeader");
+        const mobileToggle = document.getElementById("mobileToggle");
+        const mobileSidebar = document.getElementById("mobileSidebar");
+        const sidebarOverlay = document.getElementById("sidebarOverlay");
+        const sidebarClose = document.getElementById("sidebarClose");
+        const userAvatar = document.getElementById("userAvatar");
+        const currentPath = window.location.pathname;
+
+        // Scroll effect
+        window.addEventListener("scroll", function () {
+          if (window.scrollY > 20) {
+            navHeader.classList.add("scrolled");
+          } else {
+            navHeader.classList.remove("scrolled");
+          }
+        });
+
+        // Toggle sidebar mobile
+        function toggleSidebar() {
+          mobileSidebar.classList.toggle("active");
+          sidebarOverlay.classList.toggle("active");
+          document.body.style.overflow = mobileSidebar.classList.contains(
+            "active",
+          )
+            ? "hidden"
+            : "";
+        }
+
+        mobileToggle.addEventListener("click", toggleSidebar);
+        sidebarClose.addEventListener("click", toggleSidebar);
+        sidebarOverlay.addEventListener("click", toggleSidebar);
+
+        // Close sidebar when clicking on a link (mobile)
+        mobileSidebar.querySelectorAll("a").forEach((link) => {
+          link.addEventListener("click", function () {
+            setTimeout(() => {
+              toggleSidebar();
+            }, 300);
+          });
+        });
+
+        // Set active nav item based on current URL
+        function setActiveNavItem() {
+          const navItems = {
+            home: "navHome",
+            vault: "navVaults",
+            category: "navCategories",
+            credential: "navCredentials",
+            audit: "navHistory",
+          };
+
+          for (const [key, id] of Object.entries(navItems)) {
+            if (currentPath.includes(key)) {
+              const element = document.getElementById(id);
+              if (element) {
+                element.classList.add("active");
+                break;
+              }
+            }
+          }
+
+          // Pour la sidebar mobile
+          mobileSidebar.querySelectorAll(".nav-link").forEach((link) => {
+            if (link.getAttribute("href") === currentPath) {
+              link.classList.add("active");
+            }
+          });
+        }
+
+        setActiveNavItem();
+
+        // Dropdown hover effects for desktop
+        const dropdownWrappers = document.querySelectorAll(".dropdown-wrapper");
+        dropdownWrappers.forEach((wrapper) => {
+          wrapper.addEventListener("mouseenter", function () {
+            if (window.innerWidth > 768) {
+              const dropdown = this.querySelector(".dropdown-menu");
+              if (dropdown) {
+                dropdown.style.opacity = "1";
+                dropdown.style.visibility = "visible";
+                dropdown.style.transform = "translateY(0)";
+              }
+            }
+          });
+
+          wrapper.addEventListener("mouseleave", function () {
+            if (window.innerWidth > 768) {
+              const dropdown = this.querySelector(".dropdown-menu");
+              if (dropdown) {
+                dropdown.style.opacity = "0";
+                dropdown.style.visibility = "hidden";
+                dropdown.style.transform = "translateY(-10px)";
+              }
+            }
+          });
+        });
+
+        // Pour les dropdowns dans la sidebar mobile
+        const mobileDropdowns =
+          mobileSidebar.querySelectorAll(".dropdown-wrapper");
+        mobileDropdowns.forEach((wrapper) => {
+          const link = wrapper.querySelector(".nav-link");
+          const chevron = link.querySelector(".fa-chevron-down");
+          const dropdown = wrapper.querySelector(".dropdown-menu");
+
+          // Initialiser le dropdown comme fermé
+          if (dropdown) {
+            dropdown.style.display = "none";
+          }
+
+          link.addEventListener("click", function (e) {
+            if (window.innerWidth <= 768) {
+              e.preventDefault();
+
+              if (dropdown.style.display === "block") {
+                dropdown.style.display = "none";
+                if (chevron) chevron.style.transform = "rotate(0deg)";
+              } else {
+                dropdown.style.display = "block";
+                if (chevron) chevron.style.transform = "rotate(180deg)";
+              }
+            }
+          });
+        });
+
+        // Ripple effect for buttons
+        document
+          .querySelectorAll(".nav-link, .user-avatar, .logo-orb")
+          .forEach((button) => {
+            button.addEventListener("click", function (e) {
+              const rect = this.getBoundingClientRect();
+              const x = e.clientX - rect.left;
+              const y = e.clientY - rect.top;
+
+              const ripple = document.createElement("span");
+              ripple.style.cssText = `
+              position: absolute;
+              border-radius: 50%;
+              background: rgba(255, 255, 255, 0.6);
+              transform: scale(0);
+              animation: ripple 0.6s linear;
+              pointer-events: none;
+            `;
+
+              const size = Math.max(rect.width, rect.height);
+              ripple.style.width = ripple.style.height = size + "px";
+              ripple.style.left = x - size / 2 + "px";
+              ripple.style.top = y - size / 2 + "px";
+
+              this.style.position = "relative";
+              this.style.overflow = "hidden";
+              this.appendChild(ripple);
+
+              setTimeout(() => ripple.remove(), 600);
+            });
+          });
+
+        // Add CSS for ripple animation
+        const style = document.createElement("style");
+        style.textContent = `
+          @keyframes ripple {
+            to {
+              transform: scale(4);
+              opacity: 0;
+            }
+          }
+        `;
+        document.head.appendChild(style);
+
+        // Keyboard shortcuts
+        document.addEventListener("keydown", function (e) {
+          // Ctrl/Cmd + K for search
+          if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+            e.preventDefault();
+            console.log("Search triggered");
+          }
+
+          // Escape to close mobile sidebar
+          if (
+            e.key === "Escape" &&
+            mobileSidebar.classList.contains("active")
+          ) {
+            toggleSidebar();
+          }
+        });
+
+        // Redimensionnement de la fenêtre
+        window.addEventListener("resize", function () {
+          if (
+            window.innerWidth > 768 &&
+            mobileSidebar.classList.contains("active")
+          ) {
+            toggleSidebar();
+          }
+
+          const desktopNav = document.getElementById("desktopNav");
+          if (window.innerWidth <= 768) {
+            desktopNav.style.display = "none";
+            mobileToggle.style.display = "block";
+          } else {
+            desktopNav.style.display = "flex";
+            mobileToggle.style.display = "none";
+          }
+        });
+
+        // Initialiser l'affichage correct selon la taille d'écran
+        function initResponsive() {
+          const desktopNav = document.getElementById("desktopNav");
+          if (window.innerWidth <= 768) {
+            desktopNav.style.display = "none";
+            mobileToggle.style.display = "block";
+          } else {
+            desktopNav.style.display = "flex";
+            mobileToggle.style.display = "none";
+          }
+        }
+
+        initResponsive();
+      });
+      // ============================================
+// INDICATEUR DE COFFRE OUVERT
+// ============================================
+
+let vaultTimerInterval = null;
+let vaultExpiryTime = null;
+
+// Démarrer le timer du coffre ouvert
+function startVaultTimer(expiryTimestamp) {
+    vaultExpiryTime = expiryTimestamp;
+    
+    if (vaultTimerInterval) {
+        clearInterval(vaultTimerInterval);
+    }
+    
+    vaultTimerInterval = setInterval(updateVaultTimer, 1000);
+}
+
+// Mettre à jour le timer
+function updateVaultTimer() {
+    const now = Math.floor(Date.now() / 1000);
+    const remaining = vaultExpiryTime - now;
+    
+    if (remaining <= 0) {
+        clearInterval(vaultTimerInterval);
+        closeVault(true);
+        return;
+    }
+    
+    const minutes = Math.floor(remaining / 60);
+    const seconds = remaining % 60;
+    const timerDisplay = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    
+    $('#vaultTimer').text(timerDisplay);
+    
+    // Changement de couleur selon le temps restant
+    if (remaining < 60) {
+        $('#vaultTimer').css({
+            'background': 'rgba(239, 68, 68, 0.3)',
+            'color': 'var(--danger)'
+        });
+    } else if (remaining < 180) {
+        $('#vaultTimer').css({
+            'background': 'rgba(245, 158, 11, 0.3)',
+            'color': 'var(--warning)'
+        });
+    }
+}
+
+// Fermer le coffre
+function closeVault(auto = false) {
+    $.ajax({
+        url: '/vaults/close/',
+        type: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        success: function(response) {
+            if (response.success) {
+                $('#openVaultIndicator').fadeOut(300, function() {
+                    $(this).remove();
+                });
+                
+                if (!auto) {
+                    showNotification('Coffre fermé', 'info');
+                }
+                
+                // Recharger la page si on est dans le coffre
+                if ($('#vaultContent').length) {
+                    location.reload();
+                }
+            }
+        }
+    });
+}
+
+// Rafraîchir la session du coffre
+function refreshVaultSession() {
+    $.ajax({
+        url: '/vaults/refresh-session/',
+        type: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        success: function(response) {
+            if (response.success) {
+                startVaultTimer(response.expiry);
+            }
+        }
+    });
+}
+
+// Afficher une notification
+function showNotification(message, type = 'info') {
+    const colors = {
+        success: { bg: 'rgba(34, 197, 94, 0.1)', border: 'rgba(34, 197, 94, 0.3)', text: 'var(--success)', icon: 'fa-check-circle' },
+        danger: { bg: 'rgba(239, 68, 68, 0.1)', border: 'rgba(239, 68, 68, 0.3)', text: 'var(--danger)', icon: 'fa-exclamation-circle' },
+        warning: { bg: 'rgba(245, 158, 11, 0.1)', border: 'rgba(245, 158, 11, 0.3)', text: 'var(--warning)', icon: 'fa-exclamation-triangle' },
+        info: { bg: 'rgba(59, 130, 246, 0.1)', border: 'rgba(59, 130, 246, 0.3)', text: 'var(--info)', icon: 'fa-info-circle' }
+    };
+    
+    const color = colors[type] || colors.info;
+    
+    const notification = $(`
+        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
+            <div class="toast show" role="alert" style="
+                background: ${color.bg};
+                border: 1px solid ${color.border};
+                border-radius: 16px;
+                backdrop-filter: blur(10px);
+                min-width: 300px;
+            ">
+                <div class="toast-header" style="
+                    background: transparent;
+                    border-bottom: 1px solid rgba(255,255,255,0.1);
+                    color: white;
+                ">
+                    <i class="fas ${color.icon} me-2" style="color: ${color.text};"></i>
+                    <strong class="me-auto">SecureVault</strong>
+                    <button type="button" class="btn-close btn-close-white" onclick="this.closest('.position-fixed').remove()"></button>
+                </div>
+                <div class="toast-body" style="color: ${color.text};">
+                    ${message}
+                </div>
+            </div>
+        </div>
+    `);
+    
+    $('body').append(notification);
+    
+    setTimeout(() => {
+        notification.fadeOut(300, function() { $(this).remove(); });
+    }, 5000);
+}
+
+// Rafraîchir automatiquement la session à chaque action
+$(document).on('click', 'a, button', function() {
+    if ($('#openVaultIndicator').length) {
+        refreshVaultSession();
+    }
+});
+    </script>
+  </body>
+</html>

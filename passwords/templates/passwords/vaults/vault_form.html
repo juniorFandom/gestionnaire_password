@@ -1,0 +1,60 @@
+{% extends 'passwords/base.html' %}
+
+{% block content %}
+
+<h3>{{ title }}</h3>
+
+<!-- ⚠️ Message important avec confirmation -->
+<div class="alert alert-warning mt-3" role="alert">
+    ⚠️ Important : Si vous perdez le mot de passe de ce coffre, les données seront irrécupérables.
+    Nous vous recommandons d’exporter régulièrement vos mots de passe.
+</div>
+
+<form method="POST" id="vaultForm">
+    {% csrf_token %}
+
+    <div class="mb-3">
+        <label class="form-label">{{ form.name.label }}</label>
+        {{ form.name }}
+        {% if form.name.help_text %}
+            <div class="form-text">{{ form.name.help_text }}</div>
+        {% endif %}
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">{{ form.master_password.label }}</label>
+        {{ form.master_password }}
+        {% if form.master_password.help_text %}
+            <div class="form-text">{{ form.master_password.help_text }}</div>
+        {% endif %}
+    </div>
+
+    <!-- Checkbox de confirmation -->
+    <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" value="" id="confirmUnderstanding">
+        <label class="form-check-label" for="confirmUnderstanding">
+            J'ai compris que si je perds ce mot de passe, je ne pourrai plus récupérer les données.
+        </label>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary" id="submitVault">
+            <i class="fas fa-save me-1"></i>Créer le coffre
+        </button>
+        <a href="{% url 'vault_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Retour
+        </a>
+    </div>
+</form>
+
+<script>
+    // Bloquer la soumission si l'utilisateur n'a pas confirmé
+    $('#vaultForm').on('submit', function(e) {
+        if (!$('#confirmUnderstanding').is(':checked')) {
+            e.preventDefault();
+            alert('Vous devez confirmer avoir compris le risque avant de créer le coffre.');
+        }
+    });
+</script>
+
+{% endblock %}
