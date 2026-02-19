@@ -15,6 +15,8 @@ from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 import base64
 from .utils import derive_vault_key, derive_master_key
+from django.core.paginator import Paginator
+
 
 
 
@@ -90,6 +92,7 @@ def login_view(request):
         form = LoginForm()
     
     return render(request, "passwords/login.html", {"form": form})
+
 
 
 
@@ -885,12 +888,7 @@ def credential_delete(request, slug):
 # vue qui retoune la liste des logs d'acces 
 @login_required
 def audit_log(request):
-    from django.core.paginator import Paginator
-    
-    # Récupérer tous les logs de l'utilisateur
     logs = AuditLog.objects.filter(user=request.user).order_by('-created_at')
-    
-    # Pagination : 25 logs par page
     paginator = Paginator(logs, 25)
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
