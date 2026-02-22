@@ -13,7 +13,6 @@ from .models import CustomUser, Vault, Category, Credential, AuditLog
 from django.db.models import Max
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
-import base64
 from .utils import derive_vault_key, derive_master_key
 from django.core.paginator import Paginator
 from django.core.mail import EmailMessage
@@ -81,6 +80,8 @@ def register(request):
 
 # ---------- 3. Vue pour la connexion ----------
 def login_view(request):
+    if request.session.get('is_connected'):
+        return redirect('home')  
     if request.method == "POST":
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -105,8 +106,6 @@ def login_view(request):
     return render(request, "passwords/login.html", {"form": form})
 
 
-
-
 # ---------- 4. Vue pour vérifier l’OTP ----------
 def verify_otp(request):
     if request.method == "POST":
@@ -123,8 +122,8 @@ def verify_otp(request):
             if otp_saisi == otp_session:
                 user = get_object_or_404(User, id=user_id)
                 auth_login(request, user)  # Authentifie l’utilisateur définitivement
-                messages.success(request, "Connexion réussie ! 🎉")
-
+                messages.success(request, "Connexion réussie ! ")
+                request.session['is_connected'] = True
                 # Nettoyage des sessions OTP
                 del request.session["otp"]
                 del request.session["pre_otp_user_id"]

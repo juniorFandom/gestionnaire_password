@@ -1,10 +1,5 @@
-import base64
 import json
 from Crypto.Cipher import AES
-from Crypto.Random import get_random_bytes
-from hashlib import pbkdf2_hmac
-from Crypto.Protocol.KDF import PBKDF2
-from Crypto.Hash import SHA256  
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend

@@ -103,7 +103,6 @@
         height: 70px;
       }
 
-      /* ============ BRAND/LOGO ============ */
       .brand-wrapper {
         display: flex;
         align-items: center;
@@ -299,7 +298,7 @@
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         z-index: 1001;
         overflow: hidden;
-        display: block !important;
+        display: block ;
       }
 
       .dropdown-wrapper:hover .dropdown-menu {
@@ -735,7 +734,7 @@
         <!-- Navigation Desktop -->
         <ul class="nav-main" id="desktopNav">
           {% if user.is_authenticated %}
-          <li class="nav-item">
+          <li class="nav-item dropdown-wrapper">
             <a href="{% url 'home' %}" class="nav-link" id="navHome">
               <i class="fas fa-home nav-icon"></i>
               <span>Accueil</span>
@@ -749,7 +748,7 @@
               <span>Coffres</span>
               <div class="nav-indicator"></div>
             </a>
-            <div class="dropdown-menu">
+            <div class="dropdown-menu dropdown-wrapper">
               <a href="{% url 'vault_list' %}" class="dropdown-item">
                 <i class="fas fa-list"></i>
                 <span>Liste des coffres</span>
@@ -805,7 +804,7 @@
             </div>
           </li>
 
-          <li class="nav-item">
+          <li class="nav-item dropdown-wrapper" >
             <a href="{% url 'audit_log' %}" class="nav-link" id="navHistory">
               <i class="fas fa-history nav-icon"></i>
               <span>Historique</span>
@@ -1129,14 +1128,7 @@
         sidebarClose.addEventListener("click", toggleSidebar);
         sidebarOverlay.addEventListener("click", toggleSidebar);
 
-        // Close sidebar when clicking on a link (mobile)
-        mobileSidebar.querySelectorAll("a").forEach((link) => {
-          link.addEventListener("click", function () {
-            setTimeout(() => {
-              toggleSidebar();
-            }, 300);
-          });
-        });
+       
 
         // Set active nav item based on current URL
         function setActiveNavItem() {
@@ -1316,9 +1308,7 @@
 
         initResponsive();
       });
-      // ============================================
-// INDICATEUR DE COFFRE OUVERT
-// ============================================
+
 
 let vaultTimerInterval = null;
 let vaultExpiryTime = null;
@@ -1332,82 +1322,6 @@ function startVaultTimer(expiryTimestamp) {
     }
     
     vaultTimerInterval = setInterval(updateVaultTimer, 1000);
-}
-
-// Mettre à jour le timer
-function updateVaultTimer() {
-    const now = Math.floor(Date.now() / 1000);
-    const remaining = vaultExpiryTime - now;
-    
-    if (remaining <= 0) {
-        clearInterval(vaultTimerInterval);
-        closeVault(true);
-        return;
-    }
-    
-    const minutes = Math.floor(remaining / 60);
-    const seconds = remaining % 60;
-    const timerDisplay = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    
-    $('#vaultTimer').text(timerDisplay);
-    
-    // Changement de couleur selon le temps restant
-    if (remaining < 60) {
-        $('#vaultTimer').css({
-            'background': 'rgba(239, 68, 68, 0.3)',
-            'color': 'var(--danger)'
-        });
-    } else if (remaining < 180) {
-        $('#vaultTimer').css({
-            'background': 'rgba(245, 158, 11, 0.3)',
-            'color': 'var(--warning)'
-        });
-    }
-}
-
-// Fermer le coffre
-function closeVault(auto = false) {
-    $.ajax({
-        url: '/vaults/close/',
-        type: 'POST',
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        success: function(response) {
-            if (response.success) {
-                $('#openVaultIndicator').fadeOut(300, function() {
-                    $(this).remove();
-                });
-                
-                if (!auto) {
-                    showNotification('Coffre fermé', 'info');
-                }
-                
-                // Recharger la page si on est dans le coffre
-                if ($('#vaultContent').length) {
-                    location.reload();
-                }
-            }
-        }
-    });
-}
-
-// Rafraîchir la session du coffre
-function refreshVaultSession() {
-    $.ajax({
-        url: '/vaults/refresh-session/',
-        type: 'POST',
-        headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        success: function(response) {
-            if (response.success) {
-                startVaultTimer(response.expiry);
-            }
-        }
-    });
 }
 
 // Afficher une notification

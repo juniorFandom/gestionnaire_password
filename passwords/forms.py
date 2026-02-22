@@ -166,7 +166,7 @@ class CredentialForm(forms.ModelForm):
         self.request_user = kwargs.pop('request_user', None)
         super().__init__(*args, **kwargs)
         
-        # Ajuster le placeholder pour les modifications
+        
         if self.instance and self.instance.pk:
             self.fields['secret_plain'].required = False
             self.fields['secret_plain'].widget.attrs['placeholder'] = 'Laissez vide pour conserver le mot de passe actuel'
