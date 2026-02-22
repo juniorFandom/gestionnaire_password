@@ -16,6 +16,17 @@ from Crypto.Random import get_random_bytes
 import base64
 from .utils import derive_vault_key, derive_master_key
 from django.core.paginator import Paginator
+from django.core.mail import EmailMessage
+from django.utils import timezone
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.lib.enums import TA_CENTER
+import io
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 
 
 
@@ -905,3 +916,206 @@ def audit_log(request):
 def profile(request):
     return render(request, "passwords/profile.html")
 
+@login_required
+@require_POST
+def export_vault_pdf(request, vault_slug):
+    """Exporte les identifiants d'un coffre au format PDF et les envoie par email"""
+    try:
+        # Récupérer le coffre
+        vault = Vault.objects.get(slug=vault_slug, user=request.user)
+        
+        # Vérifier le mot de passe du coffre
+        vault_password = request.POST.get('vault_password')
+        if not vault_password:
+            return JsonResponse({'success': False, 'message': 'Mot de passe requis'})
+        
+        # Vérifier que le mot de passe est correct
+        if not vault.check_password(vault_password):
+            return JsonResponse({'success': False, 'message': 'Mot de passe incorrect'})
+        
+        # Récupérer tous les identifiants du coffre
+        credentials = Credential.objects.filter(vault=vault)
+        
+        if not credentials.exists():
+            return JsonResponse({'success': False, 'message': 'Aucun identifiant dans ce coffre'})
+        
+        # Déchiffrer les identifiants avec la clé du vault
+        vault_key = derive_vault_key(vault_password, vault)
+        
+        credentials_data = []
+        for cred in credentials:
+            try:
+                decrypted_password = cred.decrypt_with_vault_key(vault_key)
+                credentials_data.append({
+                    'title': cred.title,
+                    'username': cred.username,
+                    'password': decrypted_password,
+                    'url': cred.url,
+                    'notes': cred.notes,
+                    'category': cred.category.name if cred.category else None,
+                    'created_at': cred.created_at,
+                    'updated_at': cred.updated_at,
+                })
+            except Exception as e:
+                # Si un identifiant ne peut pas être déchiffré, on le skip
+                continue
+        
+        # Générer le PDF
+        pdf_buffer = generate_vault_pdf(vault, credentials_data, request.user)
+        
+        # Envoyer l'email
+        send_vault_pdf_email(request.user.email, vault.name, pdf_buffer)
+        
+        # Journaliser l'export
+        AuditLog.objects.create(
+            user=request.user,
+            vault=vault,
+            action='export',
+            target_type='Vault',
+            target_id=str(vault.id),
+            ip=request.META.get('REMOTE_ADDR'),
+            user_agent=request.META.get('HTTP_USER_AGENT', '')
+        )
+        
+        return JsonResponse({
+            'success': True, 
+            'message': f'Le PDF a été envoyé à {request.user.email}'
+        })
+        
+    except Vault.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Coffre introuvable'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': f'Erreur: {str(e)}'})
+
+def generate_vault_pdf(vault, credentials_data, user):
+    """Génère un PDF avec la liste des identifiants"""
+    buffer = io.BytesIO()
+    
+    # Créer le document PDF
+    doc = SimpleDocTemplate(buffer, pagesize=A4, 
+                           rightMargin=72, leftMargin=72,
+                           topMargin=72, bottomMargin=72)
+    
+    # Conteneur pour les éléments du PDF
+    elements = []
+    
+    # Styles
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=24,
+        textColor=colors.HexColor('#6C8CFF'),
+        spaceAfter=30,
+        alignment=TA_CENTER
+    )
+    
+    # Titre
+    elements.append(Paragraph(f"Coffre: {vault.name}", title_style))
+    elements.append(Spacer(1, 0.2*inch))
+    
+    # Informations
+    info_style = ParagraphStyle(
+        'Info',
+        parent=styles['Normal'],
+        fontSize=10,
+        textColor=colors.grey,
+        alignment=TA_CENTER
+    )
+    elements.append(Paragraph(f"Exporté le: {timezone.now().strftime('%d/%m/%Y %H:%M')}", info_style))
+    elements.append(Paragraph(f"Utilisateur: {user.email}", info_style))
+    elements.append(Paragraph(f"Nombre d'identifiants: {len(credentials_data)}", info_style))
+    elements.append(Spacer(1, 0.3*inch))
+    
+    if credentials_data:
+        # En-tête du tableau
+        data = [['Service', 'Catégorie', 'Identifiant', 'Mot de passe', 'URL']]
+        
+        # Données
+        for cred in credentials_data:
+            # Tronquer les mots de passe trop longs pour le PDF
+            password = cred['password']
+            if len(password) > 20:
+                password = password[:20] + '...'
+                
+            data.append([
+                cred['title'],
+                cred['category'] or '-',
+                cred['username'] or '-',
+                password,
+                cred['url'] or '-'
+            ])
+        
+        # Créer le tableau
+        table = Table(data, colWidths=[1.2*inch, 0.8*inch, 1.2*inch, 1.2*inch, 1.4*inch])
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#6C8CFF')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('FONTSIZE', (0, 1), (-1, -1), 8),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ]))
+        elements.append(table)
+        
+        # Ajouter les notes si présentes
+        has_notes = any(cred.get('notes') for cred in credentials_data)
+        if has_notes:
+            elements.append(Spacer(1, 0.3*inch))
+            elements.append(Paragraph("Notes:", styles['Heading2']))
+            for cred in credentials_data:
+                if cred.get('notes'):
+                    notes_text = f"<b>{cred['title']}:</b> {cred['notes']}"
+                    elements.append(Paragraph(notes_text, styles['Normal']))
+                    elements.append(Spacer(1, 0.1*inch))
+    else:
+        elements.append(Paragraph("Aucun identifiant dans ce coffre", styles['Normal']))
+    
+    # Construire le PDF
+    doc.build(elements)
+    
+    buffer.seek(0)
+    return buffer
+
+def send_vault_pdf_email(user_email, vault_name, pdf_buffer):
+    """Envoie le PDF par email"""
+    subject = f" Export du coffre: {vault_name}"
+    message = f"""
+    Bonjour,
+    
+    Veuillez trouver ci-joint l'export PDF de votre coffre "{vault_name}".
+    
+     Récapitulatif:
+    • Coffre: {vault_name}
+    • Date d'export: {timezone.now().strftime('%d/%m/%Y %H:%M')}
+    
+      ATTENTION: Ce fichier contient tous vos identifiants en clair.
+    • Conservez-le dans un endroit sécurisé (coffre-fort numérique, disque chiffré)
+    • Ne le partagez jamais par email
+    • Supprimez-le après usage si vous n'en avez plus besoin
+    
+    Pour toute question, contactez notre support.
+    
+    Cordialement,
+    L'équipe SecureVault
+    """
+    
+    email = EmailMessage(
+        subject,
+        message,
+        settings.DEFAULT_FROM_EMAIL,
+        [user_email]
+    )
+    
+    # Attacher le PDF avec un nom sécurisé
+    safe_vault_name = vault_name.replace(' ', '_').replace('/', '_')
+    email.attach(f"SecureVault_{safe_vault_name}_{timezone.now().strftime('%Y%m%d')}.pdf", 
+                pdf_buffer.getvalue(), 
+                'application/pdf')
+    
+    # Envoyer l'email
+    email.send(fail_silently=False)

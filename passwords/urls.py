@@ -35,4 +35,6 @@ urlpatterns = [
 
     # Historique / Audit
     path('audit/', views.audit_log, name='audit_log'),
+    # exportation
+    path('vaults/<slug:vault_slug>/export-pdf/', views.export_vault_pdf, name='export_vault_pdf')
 ]

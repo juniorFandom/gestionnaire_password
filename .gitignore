@@ -1,0 +1,51 @@
+# Environnement virtuel
+env311/
+venv/
+env/
+ENV/
+
+# Base de données
+*.sqlite3
+*.db
+
+# Fichiers Python compilés
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Fichiers de cache
+.Python
+*.log
+*.pot
+*.pyc
+__pycache__/
+*.egg-info/
+*.egg
+dist/
+build/
+
+# Fichiers média uploadés
+/media/
+/staticfiles/
+/static/
+
+# Fichiers de l'IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Fichiers de configuration locaux
+.env
+*.local
+*.bak
+
+# Dossiers spécifiques à Django
+/staticfiles/
+/media/
+
+# Fichiers de logs
+*.log
+logs/
