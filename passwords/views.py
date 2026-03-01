@@ -18,7 +18,7 @@ from django.core.paginator import Paginator
 from django.core.mail import EmailMessage
 from django.utils import timezone
 from reportlab.lib import colors
-from reportlab.lib.pagesizes import letter, A4
+from reportlab.lib.pagesizes import  A4
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
@@ -170,7 +170,7 @@ def home(request):
 def logout_view(request):
     logout(request)
     messages.success(request, "Vous avez été déconnecté avec succès.")
-    return redirect('login')  # redirige vers la page de connexion
+    return redirect('login')  
 
 
 
@@ -185,7 +185,7 @@ def profile_view(request):
 @login_required
 def vault_list(request):
     vaults = Vault.objects.filter(user=request.user)
-    vault_form = VaultForm()  # Pour les modals création et modification
+    vault_form = VaultForm()  
     return render(request, 'passwords/vaults/vault_list.html', {
         'vaults': vaults,
         'vault_form': vault_form
@@ -645,7 +645,7 @@ def credential_create(request):
                     return JsonResponse({
                         'success': False,
                         'errors': {'vault': ["Le Vault sélectionné n'est pas initialisé correctement."]}
-                    }, status=400)  # <-- Changé de 403 à 400
+                    }, status=400) 
                 return render(request, 'passwords/credentials/credential_form_fields.html', {'form': form, 'title': 'Ajouter un identifiant'})
 
             # Vérifier le mot de passe maître
@@ -656,7 +656,7 @@ def credential_create(request):
                     return JsonResponse({
                         'success': False,
                         'errors': {'master_password': ["Mot de passe maître incorrect."]}
-                    }, status=400)  # <-- Changé de 403 à 400
+                    }, status=400) 
                 return render(request, 'passwords/credentials/credential_form_fields.html', {'form': form, 'title': 'Ajouter un identifiant'})
 
             # Sauvegarde et chiffrement
@@ -693,7 +693,7 @@ def credential_create(request):
     return render(request, 'passwords/credentials/credential_form_fields.html', {'form': form, 'title': 'Ajouter un identifiant'})
 
 
-# vvu qui permet de dechifrer dechffrer un mot de passe de l'affciher
+# vue qui permet de dechifrer dechffrer un mot de passe de l'affciher
 @login_required
 def get_credential_password_api(request, slug):
     """
@@ -734,16 +734,14 @@ def credential_create(request):
     if request.method == 'POST':
         form = CredentialForm(
             request.POST, 
-            request_user=request.user  # ← IMPORTANT: passer l'utilisateur
+            request_user=request.user 
         )
-        
-        # Filtrer les querysets
+    
         form.fields['vault'].queryset = Vault.objects.filter(user=request.user)
         form.fields['category'].queryset = Category.objects.filter(vault__user=request.user)
         
         if form.is_valid():
-            # NE PAS UTILISER commit=False - laissez le formulaire gérer le chiffrement et la sauvegarde
-            credential = form.save()  # ← PAS de commit=False !
+            credential = form.save() 
             
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({

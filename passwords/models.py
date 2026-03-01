@@ -1,14 +1,9 @@
-from copyreg import pickle
 import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.conf import settings
 from Crypto.Cipher import AES
-import base64
 from Crypto.Random import get_random_bytes
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.backends import default_backend
 from .utils import derive_master_key
 
 
@@ -61,6 +56,7 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.email
+
 
 
 ## models du coffre (vault)
@@ -129,9 +125,7 @@ class Category(TimeStampedModel):
         return self.name
 
 
-# ==========================
-#   CREDENTIAL
-# ==========================
+# model des credentials (identifiants)
 class Credential(models.Model):
     """
     Représente un mot de passe CHIFFRÉ.
@@ -218,6 +212,7 @@ class Credential(models.Model):
         return password.decode("utf-8")
 
 
+# model des historiques du password
 class PasswordHistory(models.Model):
     credential = models.ForeignKey(Credential, on_delete=models.CASCADE, related_name="histories")
     secret_encrypted = models.BinaryField()
