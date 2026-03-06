@@ -26,6 +26,7 @@ from reportlab.lib.enums import TA_CENTER
 import io
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+from django.db import transaction
 
 
 
@@ -281,6 +282,7 @@ def access_vault_api(request, slug):
 
 # vue aui permet de creer un coffre (vault)
 @login_required
+@transaction.atomic()
 def vault_create(request):
     if request.method == 'POST':
         form = VaultForm(request.POST)
@@ -308,6 +310,7 @@ def vault_create(request):
 
 # vue qui permet la mise a jour d'un coffre
 @login_required
+@transaction.atomic()
 def vault_update(request, pk):
     vault = get_object_or_404(Vault, pk=pk, user=request.user)
     
@@ -361,6 +364,7 @@ def vault_update(request, pk):
 
 # vue qui permet de changer le mot de passe d'un coffre
 @login_required
+@transaction.atomic()
 def vault_change_password(request, slug):
     vault = get_object_or_404(Vault, slug=slug, user=request.user)
     
@@ -628,6 +632,7 @@ def credential_list(request):
 
 # vue qui permet de creer un identifiant
 @login_required
+@transaction.atomic()
 def credential_create(request):
     if request.method == 'POST':
         print("methode post")
@@ -729,6 +734,7 @@ def get_credential_password_api(request, slug):
 
 #vue qui permet de creer un identifiant 
 @login_required
+@transaction.atomic()
 def credential_create(request):
     """Vue pour créer un nouveau credential"""
     if request.method == 'POST':
@@ -768,6 +774,7 @@ def credential_create(request):
 
 # vue qui permet la mise a jour d'un identifiant
 @login_required
+@transaction.atomic()
 def credential_update(request, slug):
     """Vue pour modifier un credential existant"""
     credential = get_object_or_404(Credential, slug=slug, vault__user=request.user)
@@ -874,6 +881,7 @@ def credential_update(request, slug):
 
 #vue qui permet la suppresion d'un identifiant
 @login_required
+@transaction.atomic()
 def credential_delete(request, slug):
     try:
         credential = Credential.objects.get(slug=slug, vault__user=request.user)

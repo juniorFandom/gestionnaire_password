@@ -22,19 +22,8 @@ def derive_master_key(master_password: str, vault) -> bytes:
 
 
 def derive_vault_key(master_password: str, vault) -> bytes:
-    params = json.loads(vault.kdf_params.decode("utf-8"))
-    salt = bytes.fromhex(params["salt"])
-    iterations = params["iterations"]
 
-    kdf = PBKDF2HMAC(
-        algorithm=hashes.SHA256(),
-        length=32,
-        salt=salt,
-        iterations=iterations,
-        backend=default_backend()
-    )
-
-    master_key = kdf.derive(master_password.encode())
+    master_key = derive_master_key(master_password,vault)
 
     data = vault.vault_key_encrypted
     iv = data[:12]
