@@ -620,7 +620,7 @@
               onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none'"
             >
               {% for vault in vaults %}
-              <option value="{{ vault.id }}">{{ vault.name }}</option>
+              <option value="{{ vault.id }}" style="color:black;">{{ vault.name }}</option>
               {% endfor %}
             </select>
           </div>

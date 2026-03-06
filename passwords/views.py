@@ -187,9 +187,10 @@ def profile_view(request):
 def vault_list(request):
     vaults = Vault.objects.filter(user=request.user)
     vault_form = VaultForm()  
+    print(f"liste de coffre :{vaults}")
     return render(request, 'passwords/vaults/vault_list.html', {
         'vaults': vaults,
-        'vault_form': vault_form
+        'vault_form': vault_form,
     })
 
 # vue qui affiche les details d'un coffre 
@@ -536,10 +537,12 @@ def vault_delete(request, slug):
 @login_required
 def category_list(request):
     categories = Category.objects.filter(vault__user=request.user)
+    vaults = Vault.objects.filter(user = request.user)
     category_form = CategoryForm()
     return render(request, 'passwords/categories/category_list.html', {
         'categories': categories,
-        'category_form': category_form
+        'category_form': category_form,
+        'vaults':vaults
     })
 
 
@@ -919,7 +922,16 @@ def audit_log(request):
 # vue du profil
 @login_required
 def profile(request):
-    return render(request, "passwords/profile.html")
+    vauls_count = Vault.objects.filter(user = request.user).count()
+    credentials_count = Credential.objects.filter(user = request.user).count()
+    categorie_count = Category.objects.filter(user = request.user).count()
+    context ={
+        'vaults_count':vauls_count,
+        'credentials_count':credentials_count,
+        'categorie_count':categorie_count
+    }
+
+    return render(request, "passwords/profile.html",con)
 
 @login_required
 @require_POST
