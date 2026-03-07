@@ -922,24 +922,39 @@ def audit_log(request):
 # vue du profil
 @login_required
 def profile(request):
-    vault_count = Vault.objects.filter(user=request.user).count()   
-
-    # Nombre total d'identifiants dans tous les coffres de l'utilisateur
-    credential_count = Credential.objects.filter(vault__user=request.user).count()
-
-    # Nombre total de catégories dans tous les coffres de l'utilisateur
-    category_count = Category.objects.filter(vault__user=request.user).count()
-
-    print(vault_count,credential_count,category_count)
+    # Version debug avec requêtes séparées
+    user_vaults = Vault.objects.filter(user=request.user)
+    vault_count = user_vaults.count()
+    
+    # Requête plus explicite pour les credentials
+    credential_count = Credential.objects.filter(
+        vault__in=user_vaults
+    ).count()
+    
+    # Requête plus explicite pour les catégories
+    category_count = Category.objects.filter(
+        vault__in=user_vaults
+    ).count()
+    
+    print(f"Vaults: {vault_count}")
+    print(f"Credentials: {credential_count}") 
+    print(f"Categories: {category_count}")
+    
+    # Vérifions s'il y a des données
+    if vault_count == 0:
+        print("Aucun coffre trouvé pour l'utilisateur")
+    else:
+        # Afficher les IDs des coffres trouvés
+        vault_ids = list(user_vaults.values_list('id', flat=True))
+        print(f"IDs des coffres: {vault_ids}")
+    
     context = {
-        'vault_count':vault_count,
-        'credential_count':credential_count,
-        'category_count':category_count
+        'vault_count': vault_count,
+        'credential_count': credential_count,
+        'category_count': category_count
     }
-
-    print("liste dessus")
-
-    return render(request, "passwords/profile.html",context)
+    
+    return render(request, "passwords/profile.html", context)
 
 
 @login_required
