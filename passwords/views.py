@@ -922,16 +922,25 @@ def audit_log(request):
 # vue du profil
 @login_required
 def profile(request):
-    vauls_count = Vault.objects.filter(user = request.user).count()
-    credentials_count = Credential.objects.filter(user = request.user).count()
-    categorie_count = Category.objects.filter(user = request.user).count()
-    context ={
-        'vaults_count':vauls_count,
-        'credentials_count':credentials_count,
-        'categorie_count':categorie_count
+    vault_count = Vault.objects.filter(user=request.user).count()   
+
+    # Nombre total d'identifiants dans tous les coffres de l'utilisateur
+    credential_count = Credential.objects.filter(vault__user=request.user).count()
+
+    # Nombre total de catégories dans tous les coffres de l'utilisateur
+    category_count = Category.objects.filter(vault__user=request.user).count()
+
+    print(vault_count,credential_count,category_count)
+    context = {
+        'vault_count':vault_count,
+        'credential_count':credential_count,
+        'category_count':category_count
     }
 
-    return render(request, "passwords/profile.html",con)
+    print("liste dessus")
+
+    return render(request, "passwords/profile.html",context)
+
 
 @login_required
 @require_POST
@@ -1003,6 +1012,7 @@ def export_vault_pdf(request, vault_slug):
         return JsonResponse({'success': False, 'message': 'Coffre introuvable'})
     except Exception as e:
         return JsonResponse({'success': False, 'message': f'Erreur: {str(e)}'})
+
 
 def generate_vault_pdf(vault, credentials_data, user):
     """Génère un PDF avec la liste des identifiants"""
