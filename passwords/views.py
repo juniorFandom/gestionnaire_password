@@ -50,16 +50,16 @@ def send_otp_email(request, user):
         )
         # Affichage dans la console pour le développement
         print("=" * 50)
-        print(f"📧 EMAIL OTP ENVOYÉ")
-        print(f"👤 Utilisateur: {user.username} ({user.email})")
-        print(f"🔐 Code OTP: {otp}")
+        print(f" EMAIL OTP ENVOYÉ")
+        print(f" Utilisateur: {user.username} ({user.email})")
+        print(f" Code OTP: {otp}")
         print("=" * 50)
     except Exception as e:
         # En cas d'erreur d'envoi d'email, on affiche l'OTP dans la console
         print("=" * 50)
-        print(f"❌ ERREUR EMAIL: {e}")
-        print(f"👤 Utilisateur: {user.username} ({user.email})")
-        print(f"🔐 Code OTP: {otp}")
+        print(f" ERREUR EMAIL: {e}")
+        print(f" Utilisateur: {user.username} ({user.email})")
+        print(f" Code OTP: {otp}")
         print("=" * 50)
 
 
@@ -618,6 +618,106 @@ def category_delete(request, pk):
         messages.success(request, 'Catégorie supprimée avec succès.')
         return redirect('category_list')
     return render(request, 'passwords/categories/category_confirm_delete.html', {'category': category})
+
+
+
+# views.py
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from .models import Vault, Credential
+import json
+
+@login_required
+@require_POST
+def verify_vault_password(request, vault_slug):
+    """Vérifie si le mot de passe du coffre est correct"""
+    try:
+        vault = Vault.objects.get(slug=vault_slug, user=request.user)
+        data = json.loads(request.body) if request.content_type == 'application/json' else request.POST
+        password = data.get('vault_password')
+        
+        # Votre logique de vérification du mot de passe
+        # (à adapter selon votre implémentation)
+        if vault.check_password(password):  # Implémentez cette méthode
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'success': False, 'message': 'Mot de passe incorrect'}, status=400)
+            
+    except Vault.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Coffre introuvable'}, status=404)
+
+@login_required
+def get_credential(request, credential_id):
+    """Récupère les données d'un identifiant pour édition"""
+    try:
+        credential = Credential.objects.get(
+            id=credential_id, 
+            vault__user=request.user
+        )
+        return JsonResponse({
+            'success': True,
+            'credential': {
+                'id': credential.id,
+                'title': credential.title,
+                'username': credential.username,
+                'password': credential.get_decrypted_password(),  # À implémenter
+                'url': credential.url,
+                'notes': credential.notes,
+            }
+        })
+    except Credential.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Identifiant introuvable'}, status=404)
+
+@login_required
+@require_POST
+def update_credential(request, credential_id):
+    """Met à jour un identifiant"""
+    try:
+        credential = Credential.objects.get(
+            id=credential_id, 
+            vault__user=request.user
+        )
+        
+        # Mise à jour des champs
+        credential.title = request.POST.get('title')
+        credential.username = request.POST.get('username')
+        credential.set_password(request.POST.get('password'))  # À implémenter
+        credential.url = request.POST.get('url')
+        credential.notes = request.POST.get('notes')
+        credential.save()
+        
+        return JsonResponse({'success': True})
+        
+    except Credential.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Identifiant introuvable'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
+@login_required
+@require_POST
+def delete_credential(request, credential_id):
+    """Supprime un identifiant après vérification"""
+    try:
+        # Vérifier à nouveau le mot de passe (sécurité supplémentaire)
+        vault_password = request.POST.get('vault_password')
+        credential = Credential.objects.get(
+            id=credential_id, 
+            vault__user=request.user
+        )
+        
+        # Revérifier le mot de passe du coffre
+        if not credential.vault.check_password(vault_password):
+            return JsonResponse({'success': False, 'message': 'Mot de passe incorrect'}, status=400)
+        
+        credential.delete()
+        return JsonResponse({'success': True})
+        
+    except Credential.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Identifiant introuvable'}, status=404)
+
+
+
 
 
 # vue qui affiche a liste des identifaints 

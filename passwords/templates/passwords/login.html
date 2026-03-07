@@ -39,7 +39,35 @@
                             <i class="fas fa-lock" style="margin-right: 8px; color: var(--muted);"></i>
                             {{ form.password.label }}
                         </label>
-                        {{ form.password }}
+                        
+                        <!-- 🔥 Conteneur du champ mot de passe avec l'œil -->
+                        <div class="password-field-container" style="position: relative;">
+                            {{ form.password }}
+                            <button type="button" class="password-toggle-btn" 
+                                    onclick="togglePasswordVisibility(this)"
+                                    style="
+                                        position: absolute;
+                                        right: 12px;
+                                        top: 50%;
+                                        transform: translateY(-50%);
+                                        background: none;
+                                        border: none;
+                                        color: var(--muted);
+                                        cursor: pointer;
+                                        padding: 8px;
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        transition: color 0.3s ease;
+                                        z-index: 10;
+                                    "
+                                    onmouseover="this.style.color='var(--primary)'"
+                                    onmouseout="this.style.color='var(--muted)'"
+                                    aria-label="Afficher/masquer le mot de passe">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+
                         {% if form.password.errors %}
                         <div style="color: var(--danger); font-size: 14px; margin-top: 4px;">
                             {% for error in form.password.errors %}
@@ -70,4 +98,73 @@
         </div>
     </div>
 </div>
+
+<!-- 🔥 JavaScript pour le toggle du mot de passe -->
+<script>
+function togglePasswordVisibility(button) {
+    // Trouver le champ input associé (le frère précédent dans le conteneur)
+    const container = button.closest('.password-field-container');
+    const passwordInput = container.querySelector('input[type="password"], input[type="text"]');
+    const icon = button.querySelector('i');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+        button.setAttribute('aria-label', 'Masquer le mot de passe');
+        
+        // Optionnel : effet visuel
+        button.style.color = 'var(--primary)';
+    } else {
+        passwordInput.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+        button.setAttribute('aria-label', 'Afficher le mot de passe');
+        
+        // Optionnel : retour à la couleur normale
+        button.style.color = 'var(--muted)';
+    }
+}
+
+// Optionnel : Ajouter un raccourci clavier (Ctrl+Shift+E) pour afficher/masquer
+document.addEventListener('keydown', function(event) {
+    if (event.ctrlKey && event.shiftKey && event.key === 'E') {
+        event.preventDefault();
+        const passwordField = document.querySelector('#id_password'); // Remplacez par l'ID de votre champ
+        const toggleButton = document.querySelector('.password-toggle-btn');
+        if (toggleButton) {
+            togglePasswordVisibility(toggleButton);
+        }
+    }
+});
+</script>
+
+<!-- 🔥 CSS supplémentaire optionnel -->
+<style>
+/* Animation pour l'icône */
+.password-toggle-btn i {
+    transition: transform 0.2s ease;
+}
+
+.password-toggle-btn:hover i {
+    transform: scale(1.1);
+}
+
+/* Style pour le champ mot de passe avec padding à droite pour l'icône */
+.password-field-container input {
+    padding-right: 45px !important;
+    width: 100%;
+}
+
+/* Focus style pour le bouton */
+.password-toggle-btn:focus {
+    outline: none;
+    color: var(--primary) !important;
+}
+
+/* Optionnel : effet de glow quand le champ est focus */
+.password-field-container:focus-within .password-toggle-btn {
+    color: var(--primary);
+}
+</style>
 {% endblock %}

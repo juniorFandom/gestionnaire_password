@@ -5,19 +5,20 @@ Généré par 'django-admin startproject' en utilisant Django 5.2.6.
 """
 
 from pathlib import Path
-import certifi  
+from decouple import config 
 
 # Chemins de construction
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-9p@vwn-czqgj&7-go0liqsd68%4o=%4ho4w5%jpx^3)^i1ye@2'
 
+SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['192.168.0.100', '127.0.0.1', 'localhost']
-
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', 
+                       default='127.0.0.1,localhost',
+                       cast=lambda v: [s.strip() for s in v.split(',')])
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -96,3 +97,12 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "passwords.CustomUser"
 
+
+# Configuration Email
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT', cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = config('EMAIL_HOST_USER')

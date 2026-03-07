@@ -24,6 +24,7 @@ urlpatterns = [
     path('categories/<int:pk>/delete/', views.category_delete, name='category_delete'),
 
     # Identifiants / Credentials
+    #######
     path('credentials/', views.credential_list, name='credential_list'),
     path('credentials/create/', views.credential_create, name='credential_create'),
     path('credentials/<str:slug>/edit/', views.credential_update, name='credential_update'),
