@@ -27,6 +27,8 @@ import io
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.db import transaction
+from django.db.models import Count, Q
+
 
 
 
@@ -174,23 +176,162 @@ def logout_view(request):
     return redirect('login')  
 
 
+#vue qui permet de verifier le mot de pass d'un vault (coffre)
+@login_required
+@require_POST
+def verify_vault_password(request, vault_slug):
+    """
+    Vérifie si le mot de passe du coffre est correct
+    Utilise la même logique que vault_change_password
+    """
+    try:
+        # 1. Récupérer le coffre (vérifie qu'il appartient à l'utilisateur)
+        vault = get_object_or_404(Vault, slug=vault_slug, user=request.user)
+        
+        print(f"\n=== VÉRIFICATION MOT DE PASSE VAULT ===")
+        print(f"Vault ID: {vault.id}")
+        print(f"Vault slug: {vault.slug}")
+        print(f"Utilisateur: {request.user.email}")
+        
+        # 2. Récupérer le mot de passe depuis la requête
+        # Gère à la fois JSON et form-data
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+            password = data.get('password')
+        else:
+            password = request.POST.get('password')
+        
+        print(f"Mot de passe reçu (longueur): {len(password) if password else 0}")
+        
+        # 3. Validation de base
+        if not password:
+            return JsonResponse({
+                'success': False,
+                'message': 'Mot de passe requis.'
+            }, status=400)
+        
+        # 4. Tenter de dériver la clé du vault avec le mot de passe fourni
+        # C'est EXACTEMENT la même logique que dans vault_change_password
+        try:
+            print(f"Tentative de dérivation de la clé du vault...")
+            
+            # Cette fonction va :
+            # - Récupérer les paramètres KDF du vault (sel + itérations)
+            # - Dériver une clé maître avec PBKDF2
+            # - Tenter de déchiffrer vault_key_encrypted avec AES-GCM
+            vault_key = derive_vault_key(password, vault)
+            
+            print(f"✅ Succès ! Clé du vault dérivée: {vault_key.hex()[:32]}...")
+            
+            # Optionnel : Vérifier qu'on peut déchiffrer au moins un credential
+            # (vérification supplémentaire, pas obligatoire mais recommandée)
+            first_credential = vault.credentials.first()
+            if first_credential:
+                try:
+                    cipher = AES.new(vault_key, AES.MODE_GCM, nonce=first_credential.iv)
+                    plaintext = cipher.decrypt_and_verify(
+                        first_credential.secret_encrypted, 
+                        first_credential.tag
+                    )
+                    print(f"✅ Vérification supplémentaire: premier credential déchiffré avec succès")
+                except Exception as e:
+                    print(f"⚠️ Attention: la clé dérivée ne déchiffre pas les credentials: {str(e)}")
+                    # On ne rejette pas pour autant, car la clé peut être correcte
+                    # mais le credential pourrait être corrompu
+            
+            # Journaliser la tentative réussie (optionnel)
+            AuditLog.objects.create(
+                user=request.user,
+                action='verify',
+                vault=vault,
+                target_type='vault',
+                target_id=str(vault.id),
+                ip=request.META.get('REMOTE_ADDR'),
+                user_agent=request.META.get('HTTP_USER_AGENT', '')
+            )
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Mot de passe valide.',
+                'vault_name': vault.name,
+                'credentials_count': vault.credentials.count()
+            })
+            
+        except Exception as e:
+            print(f"❌ Erreur lors de la vérification: {str(e)}")
+            print(f"Type d'erreur: {type(e).__name__}")
+            import traceback
+            print(f"Traceback: {traceback.format_exc()}")
+        
+            AuditLog.objects.create(
+                user=request.user,
+                action='verify_failed',
+                vault=vault,
+                target_type='vault',
+                target_id=str(vault.id),
+                ip=request.META.get('REMOTE_ADDR'),
+                user_agent=request.META.get('HTTP_USER_AGENT', '')
+            )
+            
+            return JsonResponse({
+                'success': False,
+                'message': 'Mot de passe incorrect.'
+            }, status=400)
+            
+    except Vault.DoesNotExist:
+        print(f"❌ Coffre non trouvé: {vault_slug}")
+        return JsonResponse({
+            'success': False,
+            'message': 'Coffre non trouvé.'
+        }, status=404)
+    except Exception as e:
+        print(f"❌ Erreur inattendue: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'message': 'Erreur lors de la vérification.'
+        }, status=500)
+    
 
 @login_required
 def profile_view(request):
-    # On peut afficher des infos de l'utilisateur
     user = request.user
-    return render(request, 'passwords/profile.html', {'user': user})
+    user_vaults = Vault.objects.filter(user=user)
+    vault_count = user_vaults.count()
+    
+    credential_count = Credential.objects.filter(vault__user=user).count()
+    
+    category_count = Category.objects.filter(
+        vault__in=user_vaults
+    ).count()
+    
+    context = {
+        'user':user,
+        'vault_count':vault_count,
+        'credential_count':credential_count,
+        'category_count':category_count
+    }
+    return render(request, 'passwords/profile.html',context)
 
     
 # vue qui affiche la liste de coffre 
 @login_required
 def vault_list(request):
-    vaults = Vault.objects.filter(user=request.user)
-    vault_form = VaultForm()  
-    print(f"liste de coffre :{vaults}")
+    vaults = Vault.objects.filter(user=request.user).annotate(
+        total_credentials=Count('credentials'),
+        credentials_with_url=Count('credentials', filter=Q(credentials__url__isnull=False)),
+        categories_count=Count('categories', distinct=True),
+        last_updated=Max('credentials__updated_at')
+    )
+    
+    # Statistiques globales
+    total_all_credentials = sum(vault.total_credentials for vault in vaults)
+    
+    vault_form = VaultForm()
+    
     return render(request, 'passwords/vaults/vault_list.html', {
         'vaults': vaults,
         'vault_form': vault_form,
+        'total_credentials': total_all_credentials,
     })
 
 # vue qui affiche les details d'un coffre 
@@ -994,43 +1135,6 @@ def audit_log(request):
         'is_paginated': page_obj.has_other_pages(),
     }
     return render(request, "passwords/audit_log.html", context)
-
-# vue du profil
-@login_required
-def profile(request):
-    # Version debug avec requêtes séparées
-    user_vaults = Vault.objects.filter(user=request.user)
-    vault_count = user_vaults.count()
-    
-    # Requête plus explicite pour les credentials
-    credential_count = Credential.objects.filter(
-        vault__in=user_vaults
-    ).count()
-    
-    # Requête plus explicite pour les catégories
-    category_count = Category.objects.filter(
-        vault__in=user_vaults
-    ).count()
-    
-    print(f"Vaults: {vault_count}")
-    print(f"Credentials: {credential_count}") 
-    print(f"Categories: {category_count}")
-    
-    # Vérifions s'il y a des données
-    if vault_count == 0:
-        print("Aucun coffre trouvé pour l'utilisateur")
-    else:
-        # Afficher les IDs des coffres trouvés
-        vault_ids = list(user_vaults.values_list('id', flat=True))
-        print(f"IDs des coffres: {vault_ids}")
-    
-    context = {
-        'vault_count': vault_count,
-        'credential_count': credential_count,
-        'category_count': category_count
-    }
-    
-    return render(request, "passwords/profile.html", context)
 
 
 @login_required

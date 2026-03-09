@@ -1,106 +1,501 @@
 {% extends 'passwords/base.html' %}
 
-{% block title %}Inscription - Gestionnaire{% endblock %}
+{% block title %}Inscription - SecureVault{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="panel fade-in-up" style="margin-top: 40px;">
-                <div style="text-align: center; margin-bottom: 32px;">
-                    <div class="logo" style="margin: 0 auto 16px auto;"></div>
-                    <h2 style="margin: 0 0 8px 0; font-size: 28px;">Créer un compte</h2>
-                    <p style="color: var(--muted); margin: 0;">Rejoignez-nous pour sécuriser vos mots de passe</p>
-                </div>
+<div class="main-content">
+    <div class="container" style="max-width: 550px; margin: 0 auto; padding: 20px 24px;">
+        <div class="fade-in-up" style="margin-top: 20px;">
+            <!-- Logo et en-tête stylisé -->
+            <div style="text-align: center; margin-bottom: 32px;">
+                <h1 class="gradient-text" style="font-size: 36px; font-weight: 700; margin: 0 0 8px 0;">
+                    Créer un compte
+                </h1>
+                <p style="color: var(--muted); font-size: 16px; margin: 0;">
+                    Rejoignez-nous pour sécuriser vos mots de passe
+                </p>
+            </div>
 
-                <form method="post" enctype="multipart/form-data">
+            <!-- Formulaire stylisé -->
+            <div class="hover-lift" style="
+                background: linear-gradient(135deg, rgba(18, 25, 53, 0.9), rgba(15, 21, 48, 0.9));
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 32px;
+                padding: 40px;
+                backdrop-filter: blur(10px);
+                box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+                transition: all 0.3s ease;
+            ">
+                <form method="post" enctype="multipart/form-data" id="registerForm">
                     {% csrf_token %}
 
                     {% if form.non_field_errors %}
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-circle" style="margin-right: 8px;"></i>
-                        {{ form.non_field_errors }}
+                    <div style="
+                        background: rgba(239, 68, 68, 0.1);
+                        border: 1px solid rgba(239, 68, 68, 0.3);
+                        border-radius: 16px;
+                        padding: 16px;
+                        margin-bottom: 24px;
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        color: var(--danger);
+                    ">
+                        <i class="fas fa-exclamation-circle" style="font-size: 18px;"></i>
+                        <span>{{ form.non_field_errors }}</span>
                     </div>
                     {% endif %}
 
+                    <!-- Champ Nom -->
                     <div class="mb-4">
-                        <label class="form-label"
-                            style="display: block; margin-bottom: 8px; font-weight: 500; color: var(--text);">
-                            <i class="fas fa-user" style="margin-right: 8px; color: var(--muted);"></i>
+                        <label class="form-label" style="
+                            color: var(--muted);
+                            font-size: 14px;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                            margin-bottom: 8px;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                        ">
+                            <i class="fas fa-user" style="color: var(--primary); font-size: 14px;"></i>
                             {{ form.nom.label }}
                         </label>
-                        {{ form.nom }}
+                        <div class="position-relative">
+                            <i class="fas fa-id-card position-absolute" style="
+                                top: 50%; 
+                                left: 16px; 
+                                transform: translateY(-50%); 
+                                color: var(--muted); 
+                                z-index: 10;
+                                font-size: 16px;
+                                transition: color 0.3s ease;
+                            "></i>
+                            <input type="text" 
+                                   name="{{ form.nom.name }}" 
+                                   id="{{ form.nom.id_for_label }}"
+                                   value="{{ form.nom.value|default:'' }}"
+                                   class="form-control"
+                                   placeholder="Jean Dupont"
+                                   style="
+                                       padding-left: 46px;
+                                       background: rgba(255, 255, 255, 0.05);
+                                       border: 1px solid rgba(255, 255, 255, 0.1);
+                                       border-radius: 20px;
+                                       color: white;
+                                       height: 56px;
+                                       font-size: 16px;
+                                       transition: all 0.3s ease;
+                                       width: 100%;
+                                   "
+                                   onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 4px rgba(108, 140, 255, 0.15)'; this.previousElementSibling.style.color='var(--primary)'"
+                                   onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none'; if(!this.value) this.previousElementSibling.style.color='var(--muted)'"
+                                   required>
+                        </div>
                         {% if form.nom.errors %}
-                        <div style="color: var(--danger); font-size: 14px; margin-top: 4px;">
+                        <div style="
+                            color: var(--danger);
+                            font-size: 14px;
+                            margin-top: 8px;
+                            background: rgba(239, 68, 68, 0.1);
+                            border: 1px solid rgba(239, 68, 68, 0.3);
+                            border-radius: 12px;
+                            padding: 8px 12px;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                        ">
+                            <i class="fas fa-exclamation-circle"></i>
                             {% for error in form.nom.errors %}
-                            <i class="fas fa-exclamation-circle" style="margin-right: 4px;"></i>{{ error }}
+                                {{ error }}
                             {% endfor %}
                         </div>
                         {% endif %}
                     </div>
 
+                    <!-- Champ Email -->
                     <div class="mb-4">
-                        <label class="form-label"
-                            style="display: block; margin-bottom: 8px; font-weight: 500; color: var(--text);">
-                            <i class="fas fa-envelope" style="margin-right: 8px; color: var(--muted);"></i>
+                        <label class="form-label" style="
+                            color: var(--muted);
+                            font-size: 14px;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                            margin-bottom: 8px;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                        ">
+                            <i class="fas fa-envelope" style="color: var(--primary); font-size: 14px;"></i>
                             {{ form.email.label }}
                         </label>
-                        {{ form.email }}
+                        <div class="position-relative">
+                            <i class="fas fa-at position-absolute" style="
+                                top: 50%; 
+                                left: 16px; 
+                                transform: translateY(-50%); 
+                                color: var(--muted); 
+                                z-index: 10;
+                                font-size: 16px;
+                                transition: color 0.3s ease;
+                            "></i>
+                            <input type="email" 
+                                   name="{{ form.email.name }}" 
+                                   id="{{ form.email.id_for_label }}"
+                                   value="{{ form.email.value|default:'' }}"
+                                   class="form-control"
+                                   placeholder="jean@exemple.com"
+                                   style="
+                                       padding-left: 46px;
+                                       background: rgba(255, 255, 255, 0.05);
+                                       border: 1px solid rgba(255, 255, 255, 0.1);
+                                       border-radius: 20px;
+                                       color: white;
+                                       height: 56px;
+                                       font-size: 16px;
+                                       transition: all 0.3s ease;
+                                       width: 100%;
+                                   "
+                                   onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 4px rgba(108, 140, 255, 0.15)'; this.previousElementSibling.style.color='var(--primary)'"
+                                   onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none'; if(!this.value) this.previousElementSibling.style.color='var(--muted)'"
+                                   required>
+                        </div>
                         {% if form.email.errors %}
-                        <div style="color: var(--danger); font-size: 14px; margin-top: 4px;">
+                        <div style="
+                            color: var(--danger);
+                            font-size: 14px;
+                            margin-top: 8px;
+                            background: rgba(239, 68, 68, 0.1);
+                            border: 1px solid rgba(239, 68, 68, 0.3);
+                            border-radius: 12px;
+                            padding: 8px 12px;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                        ">
+                            <i class="fas fa-exclamation-circle"></i>
                             {% for error in form.email.errors %}
-                            <i class="fas fa-exclamation-circle" style="margin-right: 4px;"></i>{{ error }}
+                                {{ error }}
                             {% endfor %}
                         </div>
                         {% endif %}
                     </div>
 
+                    <!-- Champ Mot de passe 1 -->
                     <div class="mb-4">
-                        <label class="form-label"
-                            style="display: block; margin-bottom: 8px; font-weight: 500; color: var(--text);">
-                            <i class="fas fa-lock" style="margin-right: 8px; color: var(--muted);"></i>
+                        <label class="form-label" style="
+                            color: var(--muted);
+                            font-size: 14px;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                            margin-bottom: 8px;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                        ">
+                            <i class="fas fa-lock" style="color: var(--primary); font-size: 14px;"></i>
                             {{ form.password1.label }}
                         </label>
-                        {{ form.password1 }}
+                        <div class="position-relative password-field-container">
+                            <i class="fas fa-key position-absolute" style="
+                                top: 50%; 
+                                left: 16px; 
+                                transform: translateY(-50%); 
+                                color: var(--muted); 
+                                z-index: 10;
+                                font-size: 16px;
+                                transition: color 0.3s ease;
+                            "></i>
+                            <input type="password" 
+                                   name="{{ form.password1.name }}" 
+                                   id="{{ form.password1.id_for_label }}"
+                                   class="form-control password-input"
+                                   placeholder="••••••••"
+                                   style="
+                                       padding-left: 46px;
+                                       padding-right: 50px;
+                                       background: rgba(255, 255, 255, 0.05);
+                                       border: 1px solid rgba(255, 255, 255, 0.1);
+                                       border-radius: 20px;
+                                       color: white;
+                                       height: 56px;
+                                       font-size: 16px;
+                                       transition: all 0.3s ease;
+                                       width: 100%;
+                                       letter-spacing: 2px;
+                                   "
+                                   onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 4px rgba(108, 140, 255, 0.15)'; this.previousElementSibling.style.color='var(--primary)'"
+                                   onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none'; if(!this.value) this.previousElementSibling.style.color='var(--muted)'"
+                                   required>
+                            <button type="button" 
+                                    class="password-toggle-btn"
+                                    onclick="togglePassword(this)"
+                                    style="
+                                        position: absolute;
+                                        right: 12px;
+                                        top: 50%;
+                                        transform: translateY(-50%);
+                                        background: none;
+                                        border: none;
+                                        color: var(--muted);
+                                        cursor: pointer;
+                                        padding: 12px;
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        transition: all 0.3s ease;
+                                        z-index: 20;
+                                        border-radius: 50%;
+                                        width: 40px;
+                                        height: 40px;
+                                    "
+                                    onmouseover="this.style.background='rgba(108, 140, 255, 0.1)'; this.style.color='var(--primary)'"
+                                    onmouseout="this.style.background='transparent'; this.style.color='var(--muted)'"
+                                    aria-label="Afficher le mot de passe">
+                                <i class="fas fa-eye" style="font-size: 18px;"></i>
+                            </button>
+                        </div>
                         {% if form.password1.errors %}
-                        <div style="color: var(--danger); font-size: 14px; margin-top: 4px;">
+                        <div style="
+                            color: var(--danger);
+                            font-size: 14px;
+                            margin-top: 8px;
+                            background: rgba(239, 68, 68, 0.1);
+                            border: 1px solid rgba(239, 68, 68, 0.3);
+                            border-radius: 12px;
+                            padding: 8px 12px;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                        ">
+                            <i class="fas fa-exclamation-circle"></i>
                             {% for error in form.password1.errors %}
-                            <i class="fas fa-exclamation-circle" style="margin-right: 4px;"></i>{{ error }}
+                                {{ error }}
                             {% endfor %}
                         </div>
                         {% endif %}
                     </div>
 
+                    <!-- Indicateur de force du mot de passe -->
+                    <div class="mb-4" id="passwordStrength" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span style="color: var(--muted); font-size: 13px;">Force du mot de passe</span>
+                            <span id="strengthText" style="font-size: 13px; font-weight: 600;">Faible</span>
+                        </div>
+                        <div class="progress" style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px;">
+                            <div id="strengthBar" class="progress-bar" role="progressbar" style="width: 0%; border-radius: 10px; transition: width 0.3s ease;"></div>
+                        </div>
+                        <ul class="mt-2" style="color: var(--muted); font-size: 12px; list-style: none; padding: 0;">
+                            <li id="criteria-length" style="margin-bottom: 4px;"><i class="fas fa-times-circle me-2" style="color: var(--danger);"></i> Au moins 8 caractères</li>
+                            <li id="criteria-lower" style="margin-bottom: 4px;"><i class="fas fa-times-circle me-2" style="color: var(--danger);"></i> Au moins une minuscule</li>
+                            <li id="criteria-upper" style="margin-bottom: 4px;"><i class="fas fa-times-circle me-2" style="color: var(--danger);"></i> Au moins une majuscule</li>
+                            <li id="criteria-digit" style="margin-bottom: 4px;"><i class="fas fa-times-circle me-2" style="color: var(--danger);"></i> Au moins un chiffre</li>
+                            <li id="criteria-special"><i class="fas fa-times-circle me-2" style="color: var(--danger);"></i> Au moins un caractère spécial</li>
+                        </ul>
+                    </div>
+
+                    <!-- Champ Mot de passe 2 (confirmation) -->
                     <div class="mb-4">
-                        <label class="form-label"
-                            style="display: block; margin-bottom: 8px; font-weight: 500; color: var(--text);">
-                            <i class="fas fa-lock" style="margin-right: 8px; color: var(--muted);"></i>
+                        <label class="form-label" style="
+                            color: var(--muted);
+                            font-size: 14px;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                            margin-bottom: 8px;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                        ">
+                            <i class="fas fa-check-circle" style="color: var(--primary); font-size: 14px;"></i>
                             {{ form.password2.label }}
                         </label>
-                        {{ form.password2 }}
+                        <div class="position-relative password-field-container">
+                            <i class="fas fa-redo position-absolute" style="
+                                top: 50%; 
+                                left: 16px; 
+                                transform: translateY(-50%); 
+                                color: var(--muted); 
+                                z-index: 10;
+                                font-size: 16px;
+                                transition: color 0.3s ease;
+                            "></i>
+                            <input type="password" 
+                                   name="{{ form.password2.name }}" 
+                                   id="{{ form.password2.id_for_label }}"
+                                   class="form-control password-input-confirm"
+                                   placeholder="••••••••"
+                                   style="
+                                       padding-left: 46px;
+                                       padding-right: 50px;
+                                       background: rgba(255, 255, 255, 0.05);
+                                       border: 1px solid rgba(255, 255, 255, 0.1);
+                                       border-radius: 20px;
+                                       color: white;
+                                       height: 56px;
+                                       font-size: 16px;
+                                       transition: all 0.3s ease;
+                                       width: 100%;
+                                       letter-spacing: 2px;
+                                   "
+                                   onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 4px rgba(108, 140, 255, 0.15)'; this.previousElementSibling.style.color='var(--primary)'"
+                                   onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none'; if(!this.value) this.previousElementSibling.style.color='var(--muted)'"
+                                   required>
+                            <button type="button" 
+                                    class="password-toggle-btn-confirm"
+                                    onclick="togglePasswordConfirm(this)"
+                                    style="
+                                        position: absolute;
+                                        right: 12px;
+                                        top: 50%;
+                                        transform: translateY(-50%);
+                                        background: none;
+                                        border: none;
+                                        color: var(--muted);
+                                        cursor: pointer;
+                                        padding: 12px;
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        transition: all 0.3s ease;
+                                        z-index: 20;
+                                        border-radius: 50%;
+                                        width: 40px;
+                                        height: 40px;
+                                    "
+                                    onmouseover="this.style.background='rgba(108, 140, 255, 0.1)'; this.style.color='var(--primary)'"
+                                    onmouseout="this.style.background='transparent'; this.style.color='var(--muted)'"
+                                    aria-label="Afficher le mot de passe">
+                                <i class="fas fa-eye" style="font-size: 18px;"></i>
+                            </button>
+                        </div>
+                        <!-- Indicateur de correspondance des mots de passe -->
+                        <div id="passwordMatchIndicator" style="
+                            margin-top: 8px;
+                            font-size: 14px;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                            display: none;
+                        ">
+                            <i class="fas fa-circle" style="font-size: 8px;"></i>
+                            <span>Les mots de passe correspondent</span>
+                        </div>
+                        
                         {% if form.password2.errors %}
-                        <div style="color: var(--danger); font-size: 14px; margin-top: 4px;">
+                        <div style="
+                            color: var(--danger);
+                            font-size: 14px;
+                            margin-top: 8px;
+                            background: rgba(239, 68, 68, 0.1);
+                            border: 1px solid rgba(239, 68, 68, 0.3);
+                            border-radius: 12px;
+                            padding: 8px 12px;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                        ">
+                            <i class="fas fa-exclamation-circle"></i>
                             {% for error in form.password2.errors %}
-                            <i class="fas fa-exclamation-circle" style="margin-right: 4px;"></i>{{ error }}
+                                {{ error }}
                             {% endfor %}
                         </div>
                         {% endif %}
                     </div>
 
-                    <button type="submit" class="btn btn-primary"
-                        style="width: 100%; padding: 14px; font-size: 16px; font-weight: 600;">
-                        <i class="fas fa-user-plus" style="margin-right: 8px;"></i>
-                        Créer mon compte
+                    <!-- Conditions d'utilisation -->
+                    <div class="mb-4 p-3" style="
+                        background: rgba(108, 140, 255, 0.05);
+                        border: 1px solid rgba(108, 140, 255, 0.2);
+                        border-radius: 16px;
+                        transition: all 0.3s ease;
+                        display: flex;
+                        align-items: flex-start;
+                        gap: 12px;
+                    ">
+                        <input type="checkbox" id="acceptTerms" style="
+                            width: 22px;
+                            height: 22px;
+                            min-width: 22px;
+                            margin: 2px 0 0 0;
+                            background: rgba(255, 255, 255, 0.05);
+                            border: 2px solid rgba(108, 140, 255, 0.5);
+                            border-radius: 6px;
+                            cursor: pointer;
+                            transition: all 0.2s ease;
+                            appearance: none;
+                            -webkit-appearance: none;
+                            -moz-appearance: none;
+                            position: relative;
+                            display: inline-block;
+                            vertical-align: top;
+                        ">
+                        <label for="acceptTerms" style="
+                            color: var(--text);
+                            font-size: 14px;
+                            line-height: 1.5;
+                            cursor: pointer;
+                            flex: 1;
+                            margin: 0;
+                        ">
+                            J'accepte les <a href="#" style="color: var(--primary); text-decoration: none;">conditions d'utilisation</a> 
+                            et la <a href="#" style="color: var(--primary); text-decoration: none;">politique de confidentialité</a>
+                        </label>
+                    </div>
+
+                    <!-- Bouton d'inscription -->
+                    <button type="submit" class="btn hover-lift" id="registerButton" style="
+                        background: var(--gradient-primary);
+                        color: white;
+                        border: none;
+                        padding: 16px;
+                        border-radius: 24px;
+                        font-weight: 600;
+                        font-size: 16px;
+                        box-shadow: 0 8px 24px rgba(108, 140, 255, 0.4);
+                        transition: all 0.3s ease;
+                        width: 100%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 10px;
+                        cursor: pointer;
+                        position: relative;
+                        overflow: hidden;
+                        opacity: 0.5;
+                        pointer-events: none;
+                    "
+                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 32px rgba(108, 140, 255, 0.6)'"
+                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 24px rgba(108, 140, 255, 0.4)'"
+                    disabled>
+                        <span>Créer mon compte</span>
+                        <i class="fas fa-arrow-right"></i>
                     </button>
                 </form>
 
-                <div
-                    style="text-align: center; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border);">
-                    <p style="color: var(--muted); margin: 0;">
+                <!-- Lien de connexion -->
+                <div style="
+                    text-align: center; 
+                    margin-top: 24px; 
+                    padding-top: 24px; 
+                    border-top: 1px solid rgba(255, 255, 255, 0.1);
+                ">
+                    <p style="color: var(--muted); margin: 0; font-size: 15px;">
                         Déjà un compte ?
-                        <a href="{% url 'login' %}"
-                            style="color: var(--primary); text-decoration: none; font-weight: 500;">
+                        <a href="{% url 'login' %}" style="
+                            color: var(--primary);
+                            text-decoration: none;
+                            font-weight: 600;
+                            margin-left: 4px;
+                            transition: all 0.3s ease;
+                            border-bottom: 2px solid transparent;
+                            display: inline-block;
+                        " onmouseover="this.style.borderBottomColor='var(--primary)'"
+                           onmouseout="this.style.borderBottomColor='transparent'">
                             Se connecter
+                            <i class="fas fa-arrow-right" style="font-size: 12px; margin-left: 4px;"></i>
                         </a>
                     </p>
                 </div>
@@ -110,12 +505,353 @@
 </div>
 
 <script>
-    // Ajoute des classes bootstrap aux champs générés
-    (function () {
-        var inputs = document.querySelectorAll('form input');
-        inputs.forEach(function (el) {
-            el.classList.add('form-control');
-        });
-    })();
+// Fonction pour basculer la visibilité du mot de passe 1
+function togglePassword(button) {
+    const container = button.closest('.password-field-container');
+    const passwordInput = container.querySelector('.password-input');
+    const icon = button.querySelector('i');
+    const lockIcon = container.querySelector('.fa-key');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+        button.setAttribute('aria-label', 'Masquer le mot de passe');
+        button.style.color = 'var(--primary)';
+        lockIcon.style.color = 'var(--primary)';
+    } else {
+        passwordInput.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+        button.setAttribute('aria-label', 'Afficher le mot de passe');
+        button.style.color = 'var(--muted)';
+        
+        if (!passwordInput.value) {
+            lockIcon.style.color = 'var(--muted)';
+        }
+    }
+}
+
+// Fonction pour basculer la visibilité du mot de passe 2
+function togglePasswordConfirm(button) {
+    const container = button.closest('.password-field-container');
+    const passwordInput = container.querySelector('.password-input-confirm');
+    const icon = button.querySelector('i');
+    const lockIcon = container.querySelector('.fa-redo');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+        button.setAttribute('aria-label', 'Masquer le mot de passe');
+        button.style.color = 'var(--primary)';
+        lockIcon.style.color = 'var(--primary)';
+    } else {
+        passwordInput.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+        button.setAttribute('aria-label', 'Afficher le mot de passe');
+        button.style.color = 'var(--muted)';
+        
+        if (!passwordInput.value) {
+            lockIcon.style.color = 'var(--muted)';
+        }
+    }
+}
+
+// Analyse de la force du mot de passe
+document.getElementById('{{ form.password1.id_for_label }}').addEventListener('input', function() {
+    const password = this.value;
+    const strengthMeter = document.getElementById('passwordStrength');
+    const strengthBar = document.getElementById('strengthBar');
+    const strengthText = document.getElementById('strengthText');
+    
+    // Critères
+    const hasLength = password.length >= 8;
+    const hasLower = /[a-z]/.test(password);
+    const hasUpper = /[A-Z]/.test(password);
+    const hasDigit = /[0-9]/.test(password);
+    const hasSpecial = /[^a-zA-Z0-9]/.test(password);
+    
+    // Mise à jour des indicateurs
+    updateCriterion('length', hasLength);
+    updateCriterion('lower', hasLower);
+    updateCriterion('upper', hasUpper);
+    updateCriterion('digit', hasDigit);
+    updateCriterion('special', hasSpecial);
+    
+    if (password.length === 0) {
+        strengthMeter.style.display = 'none';
+        return;
+    }
+    
+    strengthMeter.style.display = 'block';
+    
+    // Calcul du score
+    let score = 0;
+    if (hasLength) score += 25;
+    if (hasLower) score += 20;
+    if (hasUpper) score += 20;
+    if (hasDigit) score += 20;
+    if (hasSpecial) score += 15;
+    
+    // Déterminer le niveau
+    let color = '#ef4444';
+    let text = 'Faible';
+    
+    if (score >= 90) {
+        color = '#22c55e';
+        text = 'Très fort';
+    } else if (score >= 70) {
+        color = '#3b82f6';
+        text = 'Fort';
+    } else if (score >= 45) {
+        color = '#eab308';
+        text = 'Moyen';
+    }
+    
+    strengthBar.style.width = Math.min(score, 100) + '%';
+    strengthBar.style.background = color;
+    strengthText.textContent = text;
+    strengthText.style.color = color;
+});
+
+function updateCriterion(criterion, isValid) {
+    const element = document.getElementById(`criteria-${criterion}`);
+    const icon = element.querySelector('i');
+    
+    if (isValid) {
+        icon.className = 'fas fa-check-circle me-2';
+        icon.style.color = '#22c55e';
+        element.style.color = '#22c55e';
+    } else {
+        icon.className = 'fas fa-times-circle me-2';
+        icon.style.color = '#ef4444';
+        element.style.color = 'var(--muted)';
+    }
+}
+
+// Vérification de la correspondance des mots de passe
+function checkPasswordMatch() {
+    const password1 = document.getElementById('{{ form.password1.id_for_label }}').value;
+    const password2 = document.getElementById('{{ form.password2.id_for_label }}').value;
+    const indicator = document.getElementById('passwordMatchIndicator');
+    const icon = indicator.querySelector('i');
+    const text = indicator.querySelector('span');
+    
+    if (password2.length > 0) {
+        indicator.style.display = 'flex';
+        if (password1 === password2) {
+            icon.className = 'fas fa-check-circle';
+            icon.style.color = '#22c55e';
+            text.textContent = 'Les mots de passe correspondent';
+            text.style.color = '#22c55e';
+        } else {
+            icon.className = 'fas fa-times-circle';
+            icon.style.color = '#ef4444';
+            text.textContent = 'Les mots de passe ne correspondent pas';
+            text.style.color = '#ef4444';
+        }
+    } else {
+        indicator.style.display = 'none';
+    }
+}
+
+document.getElementById('{{ form.password1.id_for_label }}').addEventListener('input', checkPasswordMatch);
+document.getElementById('{{ form.password2.id_for_label }}').addEventListener('input', checkPasswordMatch);
+
+// Activation du bouton d'inscription
+const termsCheckbox = document.getElementById('acceptTerms');
+const registerButton = document.getElementById('registerButton');
+
+// Style pour la checkbox cochée
+const checkboxStyle = document.createElement('style');
+checkboxStyle.textContent = `
+    #acceptTerms:checked {
+        background-color: #22c55e !important;
+        border-color: #22c55e !important;
+        position: relative;
+    }
+    #acceptTerms:checked::after {
+        content: '\\f00c';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        color: white;
+        font-size: 14px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    #acceptTerms:hover {
+        border-color: #22c55e;
+        background: rgba(34, 197, 94, 0.1);
+    }
+`;
+document.head.appendChild(checkboxStyle);
+
+termsCheckbox.addEventListener('change', function() {
+    if (this.checked) {
+        registerButton.style.opacity = '1';
+        registerButton.style.pointerEvents = 'auto';
+    } else {
+        registerButton.style.opacity = '0.5';
+        registerButton.style.pointerEvents = 'none';
+    }
+});
+
+// Validation du formulaire
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+    const nom = document.getElementById('{{ form.nom.id_for_label }}').value;
+    const email = document.getElementById('{{ form.email.id_for_label }}').value;
+    const password1 = document.getElementById('{{ form.password1.id_for_label }}').value;
+    const password2 = document.getElementById('{{ form.password2.id_for_label }}').value;
+    
+    if (!nom || !email || !password1 || !password2) {
+        e.preventDefault();
+        showNotification('Veuillez remplir tous les champs', 'warning');
+        return;
+    }
+    
+    if (password1 !== password2) {
+        e.preventDefault();
+        showNotification('Les mots de passe ne correspondent pas', 'warning');
+        return;
+    }
+    
+    if (!termsCheckbox.checked) {
+        e.preventDefault();
+        showNotification('Vous devez accepter les conditions d\'utilisation', 'warning');
+    }
+});
+
+// Fonction de notification
+function showNotification(message, type) {
+    const colors = {
+        'success': { bg: 'rgba(34, 197, 94, 0.1)', border: 'rgba(34, 197, 94, 0.3)', text: 'var(--success)', icon: 'check-circle' },
+        'warning': { bg: 'rgba(245, 158, 11, 0.1)', border: 'rgba(245, 158, 11, 0.3)', text: 'var(--warning)', icon: 'exclamation-circle' },
+        'danger': { bg: 'rgba(239, 68, 68, 0.1)', border: 'rgba(239, 68, 68, 0.3)', text: 'var(--danger)', icon: 'exclamation-circle' }
+    };
+    
+    const color = colors[type] || colors.warning;
+    
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        background: ${color.bg};
+        border: 1px solid ${color.border};
+        border-radius: 16px;
+        padding: 16px 24px;
+        color: ${color.text};
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        animation: slideIn 0.3s ease;
+    `;
+    notification.innerHTML = `
+        <i class="fas fa-${color.icon}" style="font-size: 18px;"></i>
+        <span>${message}</span>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'fadeOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 4000);
+}
 </script>
+
+<style>
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.hover-lift {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease !important;
+}
+
+.password-toggle-btn i, .password-toggle-btn-confirm i {
+    transition: transform 0.2s ease, color 0.3s ease;
+}
+
+.password-toggle-btn:hover i, .password-toggle-btn-confirm:hover i {
+    transform: scale(1.1);
+}
+
+.password-input, .password-input-confirm {
+    font-family: 'Courier New', monospace;
+    letter-spacing: 2px;
+}
+
+.form-control:focus {
+    outline: none;
+}
+
+.position-absolute i {
+    transition: color 0.3s ease;
+}
+
+::placeholder {
+    color: rgba(255, 255, 255, 0.2);
+    opacity: 1;
+}
+
+#acceptTerms {
+    transition: all 0.2s ease;
+}
+
+#acceptTerms:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.3);
+}
+
+@media (max-width: 576px) {
+    .hover-lift {
+        padding: 24px !important;
+    }
+    
+    .gradient-text {
+        font-size: 28px !important;
+    }
+}
+</style>
 {% endblock %}

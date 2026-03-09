@@ -15,6 +15,7 @@ urlpatterns = [
     path('vaults/<str:slug>/delete/', views.vault_delete, name='vault_delete'),
     path('vaults/<str:slug>/credentials/', views.vault_credentials, name='vault_credentials'),
     path('vaults/<str:slug>/access/', views.access_vault_api, name='vault_access_api'),
+    path('vaults/<slug:vault_slug>/verify-password/', views.verify_vault_password, name='verify_vault_password'),
      
 
     # Catégories
@@ -27,12 +28,9 @@ urlpatterns = [
     #######
     path('credentials/', views.credential_list, name='credential_list'),
     path('credentials/create/', views.credential_create, name='credential_create'),
-    path('credentials/<str:slug>/edit/', views.credential_update, name='credential_update'),
-    #path('credentials/<str:slug>/',views.get_credential_password, name='get_credential_password'),
+    path('credentials/<str:slug>/update/', views.credential_update, name='credential_update'),
     path('credentials/<slug:slug>/password/', views.get_credential_password_api, name='get_credential_password_api'),
-    #path('credentials/<slug:slug>/password/', views.get_credential_password, name='get_credential_password'),
     path('credentials/<slug:slug>/delete/', views.credential_delete, name='credential_delete'),
-   #path('credentials/<slug:slug>/history/', views.credential_history, name='credential_history'),
 
     # Historique / Audit
     path('audit/', views.audit_log, name='audit_log'),

@@ -2,72 +2,374 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="fas fa-folder me-2"></i>{{ title }}</h2>
-</div>
-
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-        <div class="card" >
-            <div class="card-header">
-                <h5 class="mb-0" style="color:black">
-                    <i class="fas fa-edit me-2"></i>Informations de la catégorie
-                </h5>
+<div class="main-content">
+    <div class="container" style="max-width: 680px; margin: 0 auto; ">
+        <!-- En-tête stylisé -->
+        <div class="fade-in-up" style="margin-top: 20px;">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="logo-orb" style="width: 56px; height: 56px;">
+                    <i class="fas fa-folder-open logo-icon" style="font-size: 24px;"></i>
+                </div>
+                <div>
+                    <h1 class="gradient-text" style="font-size: 32px; font-weight: 700; margin: 0;">
+                        {{ title }}
+                    </h1>
+                    <p style="color: var(--muted); margin: 4px 0 0 0; font-size: 16px;">
+                        Organisez vos identifiants par catégories
+                    </p>
+                </div>
             </div>
-            <div class="card-body">
-                <form method="POST">
+
+            <!-- Formulaire stylisé -->
+            <div class="hover-lift" style="
+                background: linear-gradient(135deg, rgba(18, 25, 53, 0.8), rgba(15, 21, 48, 0.8));
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 24px;
+                padding: 32px;
+                backdrop-filter: blur(10px);
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                transition: all 0.3s ease;
+            ">
+                <form method="POST" id="categoryForm">
                     {% csrf_token %}
 
-                    <div class="mb-3">
-                        <label class="form-label" style="color:black">
-                            <i class="fas fa-lock me-1"></i>{{ form.vault.label }}
+                    <!-- Champ Coffre -->
+                    <div class="mb-4">
+                        <label class="form-label" style="
+                            color: var(--muted);
+                            font-size: 14px;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                            margin-bottom: 8px;
+                            display: flex;
+                            align-items: center;
+                            gap: 6px;
+                        ">
+                            <i class="fas fa-lock" style="color: var(--primary); font-size: 14px;"></i>
+                            VAULT
                         </label>
-                        {{ form.vault }}
-                        {% if form.vault.help_text %}
-                        <div class="form-text">{{ form.vault.help_text }}</div>
-                        {% endif %}
-                        {% if form.vault.errors %}
-                        <div class="text-danger small">{{ form.vault.errors }}</div>
-                        {% endif %}
+                        <div class="position-relative">
+                            <i class="fas fa-archive position-absolute" style="
+                                top: 50%; 
+                                left: 16px; 
+                                transform: translateY(-50%); 
+                                color: var(--muted); 
+                                z-index: 10;
+                                font-size: 14px;
+                            "></i>
+                            <select name="vault" 
+                                    id="id_vault"
+                                    class="form-control custom-select"
+                                    required
+                                    style="
+                                        padding-left: 46px;
+                                        padding-right: 40px;
+                                        background: rgba(255, 255, 255, 0.05);
+                                        border: 1px solid rgba(255, 255, 255, 0.1);
+                                        border-radius: 16px;
+                                        color: white;
+                                        height: 52px;
+                                        font-size: 15px;
+                                        transition: all 0.3s ease;
+                                        width: 100%;
+                                        appearance: none;
+                                        -webkit-appearance: none;
+                                        -moz-appearance: none;
+                                        cursor: pointer;
+                                    "
+                                    onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 4px rgba(108, 140, 255, 0.15)'"
+                                    onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none'">
+                                {% for value, text in form.vault.field.choices %}
+                                    <option value="{{ value }}" {% if form.vault.value == value %}selected{% endif %} style="
+                                        background: #1a1f3a;
+                                        color: white;
+                                        padding: 12px;
+                                    ">
+                                        {{ text }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <!-- Flèche personnalisée -->
+                            <i class="fas fa-chevron-down position-absolute" style="
+                                top: 50%;
+                                right: 16px;
+                                transform: translateY(-50%);
+                                color: var(--muted);
+                                z-index: 10;
+                                font-size: 14px;
+                                pointer-events: none;
+                            "></i>
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label" style="color:black">
-                            <i class="fas fa-tag me-1"></i>{{ form.name.label }}
+                    <!-- Champ Nom de la catégorie -->
+                    <div class="mb-4">
+                        <label class="form-label" style="
+                            color: var(--muted);
+                            font-size: 14px;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                            margin-bottom: 8px;
+                            display: flex;
+                            align-items: center;
+                            gap: 6px;
+                        ">
+                            <i class="fas fa-tag" style="color: var(--primary); font-size: 14px;"></i>
+                            NAME
                         </label>
-                        {{ form.name }}
-                        {% if form.name.help_text %}
-                        <div class="form-text">{{ form.name.help_text }}</div>
-                        {% endif %}
-                        {% if form.name.errors %}
-                        <div class="text-danger small">{{ form.name.errors }}</div>
-                        {% endif %}
+                        <div class="position-relative">
+                            <i class="fas fa-pencil-alt position-absolute" style="
+                                top: 50%; 
+                                left: 16px; 
+                                transform: translateY(-50%); 
+                                color: var(--muted); 
+                                z-index: 10;
+                                font-size: 14px;
+                            "></i>
+                            <input type="text" 
+                                   name="name" 
+                                   id="id_name"
+                                   value="mmkl"
+                                   class="form-control"
+                                   placeholder="ex: Banques, Réseaux sociaux, Emails..."
+                                   style="
+                                       padding-left: 46px;
+                                       background: rgba(255, 255, 255, 0.05);
+                                       border: 1px solid rgba(255, 255, 255, 0.1);
+                                       border-radius: 16px;
+                                       color: white;
+                                       height: 52px;
+                                       font-size: 15px;
+                                       transition: all 0.3s ease;
+                                       width: 100%;
+                                   "
+                                   onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 4px rgba(108, 140, 255, 0.15)'"
+                                   onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none'"
+                                   required>
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label" style="color:black ">
-                            <i class="fas fa-folder me-1"></i>{{ form.parent.label }}
+                    <!-- Champ Catégorie parente -->
+                    <div class="mb-4">
+                        <label class="form-label" style="
+                            color: var(--muted);
+                            font-size: 14px;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                            margin-bottom: 8px;
+                            display: flex;
+                            align-items: center;
+                            gap: 6px;
+                        ">
+                            <i class="fas fa-sitemap" style="color: var(--primary); font-size: 14px;"></i>
+                            PARENT
                         </label>
-                        {{ form.parent }}
-                        {% if form.parent.help_text %}
-                        <div class="form-text">{{ form.parent.help_text }}</div>
-                        {% endif %}
-                        {% if form.parent.errors %}
-                        <div class="text-danger small">{{ form.parent.errors }}</div>
-                        {% endif %}
+                        <div class="position-relative">
+                            <i class="fas fa-level-up-alt position-absolute" style="
+                                top: 50%; 
+                                left: 16px; 
+                                transform: translateY(-50%); 
+                                color: var(--muted); 
+                                z-index: 10;
+                                font-size: 14px;
+                            "></i>
+                            <select name="parent" 
+                                    id="id_parent"
+                                    class="form-control custom-select"
+                                    style="
+                                        padding-left: 46px;
+                                        padding-right: 40px;
+                                        background: rgba(255, 255, 255, 0.05);
+                                        border: 1px solid rgba(255, 255, 255, 0.1);
+                                        border-radius: 16px;
+                                        color: white;
+                                        height: 52px;
+                                        font-size: 15px;
+                                        transition: all 0.3s ease;
+                                        width: 100%;
+                                        appearance: none;
+                                        -webkit-appearance: none;
+                                        -moz-appearance: none;
+                                        cursor: pointer;
+                                    "
+                                    onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 4px rgba(108, 140, 255, 0.15)'"
+                                    onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none'">
+                                <option value="" selected style="background: #1a1f3a; color: white;">---------</option>
+                                {% for value, text in form.parent.field.choices %}
+                                    {% if value %}
+                                        <option value="{{ value }}" style="background: #f6f7fa; color: black; padding: 12px;">
+                                            {{ text }}
+                                        </option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                            <!-- Flèche personnalisée -->
+                            <i class="fas fa-chevron-down position-absolute" style="
+                                top: 50%;
+                                right: 16px;
+                                transform: translateY(-50%);
+                                color: var(--muted);
+                                z-index: 10;
+                                font-size: 14px;
+                                pointer-events: none;
+                            "></i>
+                        </div>
                     </div>
 
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-1"></i>Enregistrer
+                    <!-- Boutons d'action -->
+                    <div class="d-flex gap-3 mt-4">
+                        <button type="submit" class="btn hover-lift" style="
+                            background: var(--gradient-primary);
+                            color: white;
+                            border: none;
+                            padding: 14px 32px;
+                            border-radius: 16px;
+                            font-weight: 600;
+                            font-size: 16px;
+                            box-shadow: 0 8px 24px rgba(108, 140, 255, 0.4);
+                            transition: all 0.3s ease;
+                            flex: 1;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            gap: 8px;
+                            cursor: pointer;
+                        "
+                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 32px rgba(108, 140, 255, 0.6)'"
+                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 24px rgba(108, 140, 255, 0.4)'">
+                            <i class="fas fa-save"></i>
+                            Enregistrer
                         </button>
-                        <a href="{% url 'category_list' %}" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left me-1"></i>Retour
+                        
+                        <a href="{% url 'category_list' %}" class="btn hover-lift" style="
+                            background: rgba(255, 255, 255, 0.05);
+                            border: 1px solid rgba(255, 255, 255, 0.1);
+                            color: white;
+                            padding: 14px 32px;
+                            border-radius: 16px;
+                            font-weight: 600;
+                            font-size: 16px;
+                            transition: all 0.3s ease;
+                            text-decoration: none;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            gap: 8px;
+                            cursor: pointer;
+                        "
+                        onmouseover="this.style.background='rgba(108, 140, 255, 0.1)'; this.style.borderColor='rgba(108, 140, 255, 0.3)'"
+                        onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'; this.style.borderColor='rgba(255, 255, 255, 0.1)'">
+                            <i class="fas fa-arrow-left"></i>
+                            Retour
                         </a>
                     </div>
                 </form>
             </div>
+
+            <!-- Petit conseil stylisé -->
+            <div class="mt-4 text-center fade-in-up" style="animation-delay: 0.2s;">
+                <div style="
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    background: rgba(108, 140, 255, 0.1);
+                    border: 1px solid rgba(108, 140, 255, 0.2);
+                    border-radius: 30px;
+                    padding: 8px 20px;
+                    backdrop-filter: blur(10px);
+                ">
+                    <i class="fas fa-lightbulb" style="color: var(--warning);"></i>
+                    <span style="color: var(--muted); font-size: 14px;">
+                        Les catégories vous aident à organiser vos identifiants
+                    </span>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .hover-lift {
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease !important;
+    }
+
+    /* Style pour les options du select */
+    .custom-select option {
+        background-color: #1a1f3a;
+        color: white;
+        padding: 12px;
+        font-size: 15px;
+    }
+
+    /* Pour Chrome/Safari */
+    .custom-select::-webkit-listbox {
+        background-color: #1a1f3a;
+        color: white;
+    }
+
+    /* Pour Firefox */
+    .custom-select option {
+        background-color: #1a1f3a;
+        color: white;
+    }
+
+    /* Style au survol des options */
+    .custom-select option:hover {
+        background-color: rgba(108, 140, 255, 0.2);
+    }
+
+    /* Animation pour les icônes */
+    .position-relative i {
+        transition: color 0.3s ease;
+    }
+
+    /* Focus sur les champs */
+    .form-control:focus, .custom-select:focus {
+        outline: none;
+    }
+
+    /* Style pour le placeholder */
+    ::placeholder {
+        color: rgba(255, 255, 255, 0.3);
+        opacity: 1;
+    }
+</style>
+
+<script>
+    $(document).ready(function() {
+        // Animation de focus pour les icônes
+        $('.form-control, .custom-select').on('focus', function() {
+            $(this).closest('.position-relative').find('i:first').css('color', 'var(--primary)');
+        }).on('blur', function() {
+            if (!$(this).val()) {
+                $(this).closest('.position-relative').find('i:first').css('color', 'var(--muted)');
+            }
+        });
+
+        // Garder l'icône colorée si le champ a une valeur
+        $('.form-control, .custom-select').each(function() {
+            if ($(this).val()) {
+                $(this).closest('.position-relative').find('i:first').css('color', 'var(--primary)');
+            }
+        });
+    });
+</script>
 {% endblock %}

@@ -1,60 +1,497 @@
 {% extends 'passwords/base.html' %}
 
 {% block content %}
+<div class="main-content">
+    <div class="container" style="max-width: 680px; margin: 0 auto; padding: 20px 24px;">
+        <!-- En-tête stylisé -->
+        <div class="fade-in-up" style="margin-top: 20px;">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="logo-orb" style="width: 56px; height: 56px;">
+                    <i class="fas fa-lock logo-icon" style="font-size: 24px;"></i>
+                </div>
+                <div>
+                    <h1 class="gradient-text" style="font-size: 32px; font-weight: 700; margin: 0;">
+                        {{ title }}
+                    </h1>
+                    <p style="color: var(--muted); margin: 4px 0 0 0; font-size: 16px;">
+                        Créez un coffre sécurisé pour vos identifiants
+                    </p>
+                </div>
+            </div>
 
-<h3>{{ title }}</h3>
+            <!-- Message d'avertissement stylisé -->
+            <div class="alert-glow mb-4" style="
+                background: rgba(245, 158, 11, 0.1);
+                border: 1px solid rgba(245, 158, 11, 0.3);
+                border-radius: 20px;
+                padding: 20px;
+                backdrop-filter: blur(10px);
+                box-shadow: 0 8px 32px rgba(245, 158, 11, 0.2);
+                animation: slideDown 0.4s ease-out;
+            ">
+                <div class="d-flex align-items-start gap-3">
+                    <div style="
+                        width: 40px;
+                        height: 40px;
+                        background: rgba(245, 158, 11, 0.2);
+                        border-radius: 12px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        flex-shrink: 0;
+                    ">
+                        <i class="fas fa-exclamation-triangle" style="color: var(--warning); font-size: 20px;"></i>
+                    </div>
+                    <div>
+                        <h5 style="color: var(--warning); font-weight: 700; margin: 0 0 4px 0; font-size: 16px;">
+                            ⚠️ Attention : Point de non-retour
+                        </h5>
+                        <p style="color: var(--text); margin: 0; font-size: 14px; opacity: 0.9;">
+                            Si vous perdez le mot de passe de ce coffre, <strong style="color: var(--warning);">les données seront irrécupérables</strong>. 
+                            Nous vous recommandons d'exporter régulièrement vos mots de passe.
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-<!-- ⚠️ Message important avec confirmation -->
-<div class="alert alert-warning mt-3" role="alert">
-    ⚠️ Important : Si vous perdez le mot de passe de ce coffre, les données seront irrécupérables.
-    Nous vous recommandons d’exporter régulièrement vos mots de passe.
+            <!-- Formulaire stylisé -->
+            <div class="hover-lift" style="
+                background: linear-gradient(135deg, rgba(18, 25, 53, 0.8), rgba(15, 21, 48, 0.8));
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 24px;
+                padding: 32px;
+                backdrop-filter: blur(10px);
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                transition: all 0.3s ease;
+            ">
+                <form method="POST" id="vaultForm">
+                    {% csrf_token %}
+
+                    <!-- Champ Nom du coffre -->
+                    <div class="mb-4">
+                        <label class="form-label" style="
+                            color: var(--muted);
+                            font-size: 14px;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                            margin-bottom: 8px;
+                            display: flex;
+                            align-items: center;
+                            gap: 6px;
+                        ">
+                            <i class="fas fa-tag" style="color: var(--primary); font-size: 14px;"></i>
+                            {{ form.name.label }}
+                        </label>
+                        <div class="position-relative">
+                            <i class="fas fa-lock position-absolute" style="
+                                top: 50%; 
+                                left: 16px; 
+                                transform: translateY(-50%); 
+                                color: var(--muted); 
+                                z-index: 2;
+                                font-size: 14px;
+                            "></i>
+                            <input type="text" 
+                                   name="{{ form.name.name }}" 
+                                   id="{{ form.name.id_for_label }}"
+                                   value="{{ form.name.value|default:'' }}"
+                                   class="form-control"
+                                   placeholder="ex: Coffre personnel, Banques, Travail..."
+                                   style="
+                                       padding-left: 46px;
+                                       background: rgba(255, 255, 255, 0.05);
+                                       border: 1px solid rgba(255, 255, 255, 0.1);
+                                       border-radius: 16px;
+                                       color: var(--text);
+                                       height: 52px;
+                                       font-size: 15px;
+                                       transition: all 0.3s ease;
+                                       width: 100%;
+                                   "
+                                   onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 4px rgba(108, 140, 255, 0.15)'"
+                                   onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none'"
+                                   required>
+                        </div>
+                        {% if form.name.help_text %}
+                            <div class="form-text" style="color: var(--muted); font-size: 13px; margin-top: 6px;">
+                                <i class="fas fa-info-circle me-1" style="color: var(--primary);"></i>
+                                {{ form.name.help_text }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Champ Mot de passe maître -->
+                    <div class="mb-4">
+                        <label class="form-label" style="
+                            color: var(--muted);
+                            font-size: 14px;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                            margin-bottom: 8px;
+                            display: flex;
+                            align-items: center;
+                            gap: 6px;
+                        ">
+                            <i class="fas fa-key" style="color: var(--primary); font-size: 14px;"></i>
+                            {{ form.master_password.label }}
+                        </label>
+                        <div class="position-relative">
+                            <i class="fas fa-shield-alt position-absolute" style="
+                                top: 50%; 
+                                left: 16px; 
+                                transform: translateY(-50%); 
+                                color: var(--muted); 
+                                z-index: 2;
+                                font-size: 14px;
+                            "></i>
+                            <input type="password" 
+                                   name="{{ form.master_password.name }}" 
+                                   id="{{ form.master_password.id_for_label }}"
+                                   class="form-control"
+                                   placeholder="Entrez un mot de passe fort..."
+                                   style="
+                                       padding-left: 46px;
+                                       padding-right: 45px;
+                                       background: rgba(255, 255, 255, 0.05);
+                                       border: 1px solid rgba(255, 255, 255, 0.1);
+                                       border-radius: 16px;
+                                       color: var(--text);
+                                       height: 52px;
+                                       font-size: 15px;
+                                       transition: all 0.3s ease;
+                                       width: 100%;
+                                   "
+                                   onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 4px rgba(108, 140, 255, 0.15)'"
+                                   onblur="this.style.borderColor='rgba(255, 255, 255, 0.1)'; this.style.boxShadow='none'"
+                                   required>
+                            <!-- Œil pour voir le mot de passe -->
+                            <span class="password-toggle" style="
+                                position: absolute;
+                                right: 16px;
+                                top: 50%;
+                                transform: translateY(-50%);
+                                color: var(--muted);
+                                cursor: pointer;
+                                z-index: 10;
+                                font-size: 16px;
+                                transition: color 0.2s ease;
+                                background: transparent;
+                                border: none;
+                                padding: 8px;
+                            " onclick="togglePassword(this)">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                        {% if form.master_password.help_text %}
+                            <div class="form-text" style="color: var(--muted); font-size: 13px; margin-top: 6px;">
+                                <i class="fas fa-info-circle me-1" style="color: var(--primary);"></i>
+                                {{ form.master_password.help_text }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Indicateur de force du mot de passe -->
+                    <div class="mb-4" id="passwordStrength" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span style="color: var(--muted); font-size: 13px;">Force du mot de passe</span>
+                            <span id="strengthText" style="font-size: 13px; font-weight: 600;">Faible</span>
+                        </div>
+                        <div class="progress" style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px;">
+                            <div id="strengthBar" class="progress-bar" role="progressbar" style="width: 0%; border-radius: 10px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Checkbox de confirmation stylisé -->
+                    <div class="form-check mb-4 p-3" style="
+                        background: rgba(252, 253, 255, 0.05);
+                        border: 1px solid rgba(80, 114, 237, 0.2);
+                        border-radius: 16px;
+                        transition: all 0.3s ease;
+                    "
+                    onmouseover="this.style.background='rgba(108, 140, 255, 0.1)'; this.style.borderColor='rgba(108, 140, 255, 0.3)'"
+                    onmouseout="this.style.background='rgba(108, 140, 255, 0.05)'; this.style.borderColor='rgba(108, 140, 255, 0.2)'">
+                        <input class="form-check-input m-1" type="checkbox" value="" id="confirmUnderstanding" style="
+                            width: 20px;
+                            height: 20px;
+                            margin-top: 2px;
+                            background: rgba(254, 254, 254, 0.05);
+                            border: 2px solid rgba(108, 140, 255, 0.5);
+                            border-radius: 6px;
+                            cursor: pointer;
+                            transition: all 0.2s ease;
+                        ">
+                        <label class="form-check-label" for="confirmUnderstanding" style="
+                            color: var(--text);
+                            font-size: 15px;
+                            margin-left: 8px;
+                            cursor: pointer;
+                        ">
+                            <strong style="color: var(--warning);">J'ai compris</strong> que si je perds ce mot de passe, 
+                            <strong style="color: var(--danger);">je ne pourrai plus récupérer les données</strong>.
+                        </label>
+                    </div>
+
+                    <!-- Boutons d'action -->
+                    <div class="d-flex gap-3 mt-4">
+                        <button type="submit" class="btn hover-lift" id="submitVault" style="
+                            background: var(--gradient-primary);
+                            color: white;
+                            border: none;
+                            padding: 14px 32px;
+                            border-radius: 16px;
+                            font-weight: 600;
+                            font-size: 16px;
+                            box-shadow: 0 8px 24px rgba(108, 140, 255, 0.4);
+                            transition: all 0.3s ease;
+                            flex: 1;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            gap: 8px;
+                        "
+                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 32px rgba(108, 140, 255, 0.6)'"
+                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 24px rgba(108, 140, 255, 0.4)'"
+                        disabled>
+                            <i class="fas fa-save"></i>
+                            Créer le coffre
+                        </button>
+                        
+                        <a href="{% url 'vault_list' %}" class="btn hover-lift" style="
+                            background: rgba(255, 255, 255, 0.05);
+                            border: 1px solid rgba(255, 255, 255, 0.1);
+                            color: var(--text);
+                            padding: 14px 32px;
+                            border-radius: 16px;
+                            font-weight: 600;
+                            font-size: 16px;
+                            transition: all 0.3s ease;
+                            text-decoration: none;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            gap: 8px;
+                        "
+                        onmouseover="this.style.background='rgba(108, 140, 255, 0.1)'; this.style.borderColor='rgba(108, 140, 255, 0.3)'"
+                        onmouseout="this.style.background='rgba(255, 255, 255, 0.05)'; this.style.borderColor='rgba(255, 255, 255, 0.1)'">
+                            <i class="fas fa-arrow-left"></i>
+                            Retour
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
-<form method="POST" id="vaultForm">
-    {% csrf_token %}
-
-    <div class="mb-3">
-        <label class="form-label">{{ form.name.label }}</label>
-        {{ form.name }}
-        {% if form.name.help_text %}
-            <div class="form-text">{{ form.name.help_text }}</div>
-        {% endif %}
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">{{ form.master_password.label }}</label>
-        {{ form.master_password }}
-        {% if form.master_password.help_text %}
-            <div class="form-text">{{ form.master_password.help_text }}</div>
-        {% endif %}
-    </div>
-
-    <!-- Checkbox de confirmation -->
-    <div class="form-check mb-3">
-        <input class="form-check-input" type="checkbox" value="" id="confirmUnderstanding">
-        <label class="form-check-label" for="confirmUnderstanding">
-            J'ai compris que si je perds ce mot de passe, je ne pourrai plus récupérer les données.
-        </label>
-    </div>
-
-    <div class="d-flex gap-2">
-        <button type="submit" class="btn btn-primary" id="submitVault">
-            <i class="fas fa-save me-1"></i>Créer le coffre
-        </button>
-        <a href="{% url 'vault_list' %}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left me-1"></i>Retour
-        </a>
-    </div>
-</form>
-
 <script>
-    // Bloquer la soumission si l'utilisateur n'a pas confirmé
+    // Fonction pour afficher/masquer le mot de passe
+    function togglePassword(element) {
+        const input = element.previousElementSibling;
+        const icon = element.querySelector('i');
+        
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'fas fa-eye-slash';
+            element.style.color = 'var(--primary)';
+        } else {
+            input.type = 'password';
+            icon.className = 'fas fa-eye';
+            element.style.color = 'var(--muted)';
+        }
+    }
+
+    // Gestionnaire de soumission
     $('#vaultForm').on('submit', function(e) {
         if (!$('#confirmUnderstanding').is(':checked')) {
             e.preventDefault();
-            alert('Vous devez confirmer avoir compris le risque avant de créer le coffre.');
+            
+            // Animation d'erreur sur la checkbox
+            const $checkbox = $('.form-check');
+            $checkbox.css('border-color', 'var(--danger)');
+            setTimeout(() => $checkbox.css('border-color', 'rgba(108, 140, 255, 0.2)'), 1000);
+            
+            // Notification d'erreur
+            showNotification('Vous devez confirmer avoir compris le risque avant de créer le coffre.', 'warning');
+            return false;
         }
     });
+
+    // Activer le bouton quand la checkbox est cochée
+    $('#confirmUnderstanding').on('change', function() {
+        $('#submitVault').prop('disabled', !this.checked);
+    });
+
+    // Analyse de la force du mot de passe
+    $('#{{ form.master_password.id_for_label }}').on('input', function() {
+        const password = $(this).val();
+        const strengthMeter = $('#passwordStrength');
+        const strengthBar = $('#strengthBar');
+        const strengthText = $('#strengthText');
+        
+        if (password.length === 0) {
+            strengthMeter.hide();
+            return;
+        }
+        
+        strengthMeter.show();
+        
+        let strength = 0;
+        let color = '#ef4444';
+        let text = 'Faible';
+        
+        // Critères de force
+        if (password.length >= 8) strength += 25;
+        if (password.match(/[a-z]/)) strength += 25;
+        if (password.match(/[A-Z]/)) strength += 25;
+        if (password.match(/[0-9]/)) strength += 15;
+        if (password.match(/[^a-zA-Z0-9]/)) strength += 10;
+        
+        // Déterminer le niveau
+        if (strength >= 80) {
+            color = '#22c55e';
+            text = 'Très fort';
+        } else if (strength >= 60) {
+            color = '#3b82f6';
+            text = 'Fort';
+        } else if (strength >= 40) {
+            color = '#eab308';
+            text = 'Moyen';
+        } else {
+            color = '#ef4444';
+            text = 'Faible';
+        }
+        
+        strengthBar.css({
+            'width': strength + '%',
+            'background': color,
+            'transition': 'width 0.3s ease'
+        });
+        strengthText.text(text);
+        strengthText.css('color', color);
+    });
+
+    // Notification personnalisée
+    function showNotification(message, type) {
+        const colors = {
+            'success': { bg: 'rgba(34, 197, 94, 0.1)', border: 'rgba(34, 197, 94, 0.3)', text: 'var(--success)', icon: 'check-circle' },
+            'warning': { bg: 'rgba(245, 158, 11, 0.1)', border: 'rgba(245, 158, 11, 0.3)', text: 'var(--warning)', icon: 'exclamation-circle' },
+            'danger': { bg: 'rgba(239, 68, 68, 0.1)', border: 'rgba(239, 68, 68, 0.3)', text: 'var(--danger)', icon: 'exclamation-circle' }
+        };
+        
+        const color = colors[type] || colors.warning;
+        
+        const notification = $(`
+            <div style="
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 9999;
+                background: ${color.bg};
+                border: 1px solid ${color.border};
+                border-radius: 16px;
+                padding: 16px 24px;
+                color: ${color.text};
+                backdrop-filter: blur(10px);
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                animation: slideIn 0.3s ease;
+            ">
+                <i class="fas fa-${color.icon}" style="font-size: 18px;"></i>
+                <span>${message}</span>
+            </div>
+        `);
+        
+        $('body').append(notification);
+        
+        setTimeout(() => {
+            notification.fadeOut(300, function() { $(this).remove(); });
+        }, 4000);
+    }
 </script>
 
+<style>
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .hover-lift {
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease !important;
+    }
+
+    .form-check-input:checked {
+        background-color: green;
+        border-color: var(--primary);
+    }
+
+    .form-check-input:focus {
+        box-shadow: 0 0 0 3px rgba(23, 197, 49, 0.25);
+    }
+      #confirmUnderstanding:checked {
+        background-color: #22c55e !important;  /* Vert vif */
+        border-color: #22c55e !important;
+        position: relative;
+        box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3);
+    }
+    
+    #confirmUnderstanding:checked::after {
+        content: '\f00c';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        color: white;
+        font-size: 16px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    
+    #confirmUnderstanding:hover {
+        border-color: #22c55e;
+        background: rgba(34, 197, 94, 0.1);
+        transform: scale(1.05);
+    }
+    
+    #confirmUnderstanding:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.3);
+    }
+</style>
 {% endblock %}

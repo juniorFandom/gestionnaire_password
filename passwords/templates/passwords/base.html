@@ -1087,7 +1087,7 @@
     <main class="main-content">
       <div
         class="container"
-        style="max-width: 1280px; margin: 0 auto; padding: 0 24px"
+        style="max-width: 1280px; margin: 0 auto;"
       >
         {% block content %} {% endblock %}
       </div>
@@ -1310,19 +1310,7 @@
       });
 
 
-let vaultTimerInterval = null;
-let vaultExpiryTime = null;
 
-// Démarrer le timer du coffre ouvert
-function startVaultTimer(expiryTimestamp) {
-    vaultExpiryTime = expiryTimestamp;
-    
-    if (vaultTimerInterval) {
-        clearInterval(vaultTimerInterval);
-    }
-    
-    vaultTimerInterval = setInterval(updateVaultTimer, 1000);
-}
 
 // Afficher une notification
 function showNotification(message, type = 'info') {

@@ -195,7 +195,7 @@
                         border: 1px solid rgba(34, 197, 94, 0.3);
                       "
                     >
-                      {{ vault.credential_count|default:"0" }} identifiants
+                      {{ vault.total_credentials|default:"0" }} identifiants
                     </span>
                     <button
                       class="btn btn-open-vault"
@@ -1938,6 +1938,73 @@ $("#confirmVaultPassword").on("click", function () {
       },
     });
   });
+
+  // ============================================
+// YEUX POUR LES MODALES DE COFFRE
+// ============================================
+
+function initPasswordToggles() {
+    // Cibler spécifiquement vos modales
+    const modals = [
+        '#vaultPasswordModal',
+        '#vaultEditModal',
+        '#vaultChangePasswordModal',
+        '#vaultDeleteModal',
+        '#exportPDFModal'
+    ];
+    
+    modals.forEach(modalId => {
+        const modal = document.querySelector(modalId);
+        if (!modal) return;
+        
+        modal.querySelectorAll('input[type="password"]').forEach(field => {
+            addEyeToField(field);
+        });
+    });
+}
+
+function addEyeToField(field) {
+    if (field.dataset.hasEye) return;
+    field.dataset.hasEye = 'true';
+    
+    const wrapper = field.parentElement;
+    wrapper.style.position = 'relative';
+    
+    const eye = document.createElement('span');
+    eye.className = 'password-eye';
+    eye.innerHTML = '<i class="fas fa-eye"></i>';
+    eye.style.cssText = `
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--muted);
+        cursor: pointer;
+        z-index: 10;
+        font-size: 16px;
+        transition: color 0.3s ease;
+    `;
+    
+    eye.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const isPassword = field.type === 'password';
+        field.type = isPassword ? 'text' : 'password';
+        eye.innerHTML = `<i class="fas fa-${isPassword ? 'eye-slash' : 'eye'}"></i>`;
+        eye.style.color = isPassword ? 'var(--primary)' : 'var(--muted)';
+    });
+    
+    wrapper.appendChild(eye);
+}
+
+// Initialiser au chargement
+document.addEventListener('DOMContentLoaded', initPasswordToggles);
+
+// Réinitialiser quand les modales sont ouvertes
+document.addEventListener('shown.bs.modal', function(event) {
+    initPasswordToggles();
+});
 </script>
 
 <style>

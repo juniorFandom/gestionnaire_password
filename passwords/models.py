@@ -78,7 +78,7 @@ class Vault(TimeStampedModel):
         ordering = ["name"]
 
     def __str__(self):
-        return f"{self.name}--{self.user.username}----{self.slug}-----{self.kdf_params}"
+        return f"{self.name}"
     
 
     def check_password(self, password: str) -> bool:

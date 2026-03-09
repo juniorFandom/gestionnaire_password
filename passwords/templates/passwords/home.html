@@ -221,14 +221,14 @@
                     </thead>
                     <tbody>
                       {% for credential in recent_credentials %}
-                      <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                        <td style="padding: 16px 2;">
+                      <tr class="m-2" style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                        <td class="m-2" >
                           <a href="#" style="color: black; text-decoration: none; font-weight: 500;">
                             {{ credential.title }}
                           </a>
                         </td>
-                        <td style="padding: 16px 0; color: var(--muted);">{{ credential.username|truncatechars:25 }}</td>
-                        <td style="padding: 16px 0;">
+                        <td style=" color: var(--muted);">{{ credential.username|truncatechars:25 }}</td>
+                        <td>
                           <span style="
                             background: rgba(108, 140, 255, 0.1);
                             color: var(--primary);
