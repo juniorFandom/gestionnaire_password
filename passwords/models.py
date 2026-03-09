@@ -62,7 +62,7 @@ class CustomUser(AbstractUser):
 ## models du coffre (vault)
 
 class Vault(TimeStampedModel):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='users')
     slug = models.SlugField(unique=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=120)
     description = models.TextField(blank=True)
@@ -78,7 +78,7 @@ class Vault(TimeStampedModel):
         ordering = ["name"]
 
     def __str__(self):
-        return f"{self.name}--{self.user.username}"
+        return f"{self.name}--{self.user.username}----{self.slug}-----{self.kdf_params}"
     
 
     def check_password(self, password: str) -> bool:
@@ -268,3 +268,6 @@ class AuditLog(models.Model):
             models.Index(fields=["vault", "action", "created_at"]),
         ]
         ordering = ["-created_at"]
+    
+    def __str__(self):
+        return f"{self.user}======{self.target_type}"

@@ -536,7 +536,7 @@ def vault_delete(request, slug):
 # vue aui affiche les categories 
 @login_required
 def category_list(request):
-    categories = Category.objects.filter(vault__user=request.user)
+    categories = Category.objects.select_related('parent').filter(vault__user=request.user)
     vaults = Vault.objects.filter(user = request.user)
     category_form = CategoryForm()
     return render(request, 'passwords/categories/category_list.html', {
@@ -621,32 +621,6 @@ def category_delete(request, pk):
 
 
 
-# views.py
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-from .models import Vault, Credential
-import json
-
-@login_required
-@require_POST
-def verify_vault_password(request, vault_slug):
-    """Vérifie si le mot de passe du coffre est correct"""
-    try:
-        vault = Vault.objects.get(slug=vault_slug, user=request.user)
-        data = json.loads(request.body) if request.content_type == 'application/json' else request.POST
-        password = data.get('vault_password')
-        
-        # Votre logique de vérification du mot de passe
-        # (à adapter selon votre implémentation)
-        if vault.check_password(password):  # Implémentez cette méthode
-            return JsonResponse({'success': True})
-        else:
-            return JsonResponse({'success': False, 'message': 'Mot de passe incorrect'}, status=400)
-            
-    except Vault.DoesNotExist:
-        return JsonResponse({'success': False, 'message': 'Coffre introuvable'}, status=404)
-
 @login_required
 def get_credential(request, credential_id):
     """Récupère les données d'un identifiant pour édition"""
@@ -668,6 +642,7 @@ def get_credential(request, credential_id):
         })
     except Credential.DoesNotExist:
         return JsonResponse({'success': False, 'message': 'Identifiant introuvable'}, status=404)
+
 
 @login_required
 @require_POST
@@ -693,6 +668,7 @@ def update_credential(request, credential_id):
         return JsonResponse({'success': False, 'message': 'Identifiant introuvable'}, status=404)
     except Exception as e:
         return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
 
 @login_required
 @require_POST
@@ -723,7 +699,7 @@ def delete_credential(request, credential_id):
 # vue qui affiche a liste des identifaints 
 @login_required
 def credential_list(request):
-    credentials = Credential.objects.filter(vault__user=request.user)
+    credentials = Credential.objects.select_related('vault','category').filter(vault__user=request.user)
     vaults = Vault.objects.filter(user=request.user)
     categories = Category.objects.filter(vault__user=request.user)
     
