@@ -1,0 +1,8 @@
+/env311
+.env
+.env.example
+.gitignore
+.md
+.vscode
+/pycache
+

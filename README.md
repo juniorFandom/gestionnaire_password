@@ -1,6 +1,6 @@
 # Projet gestionnaire de mot de pass 
 
-Application web de gestionnaire de mot de pass développée avec Django et Django REST Framework.
+Application web de gestionnaire de mot de pass développée avec Django utilisant une application molothique.
 
 ## Prérequis
 

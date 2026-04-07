@@ -38,9 +38,9 @@ User = get_user_model()
 
 # ---------- 1. Fonction pour envoyer un OTP par email ----------
 def send_otp_email(request, user):
-    otp = get_random_string(length=6, allowed_chars='0123456789')  # Génère un code OTP à 6 chiffres
-    request.session['otp'] = otp  # Stocker dans la session
-    request.session['pre_otp_user_id'] = user.id  # Lier l'utilisateur avant validation
+    otp = get_random_string(length=6, allowed_chars='0123456789') 
+    request.session['otp'] = otp  
+    request.session['pre_otp_user_id'] = user.id  
 
     try:
         send_mail(
@@ -50,12 +50,6 @@ def send_otp_email(request, user):
             [user.email],
             fail_silently=False,
         )
-        # Affichage dans la console pour le développement
-        print("=" * 50)
-        print(f" EMAIL OTP ENVOYÉ")
-        print(f" Utilisateur: {user.username} ({user.email})")
-        print(f" Code OTP: {otp}")
-        print("=" * 50)
     except Exception as e:
         # En cas d'erreur d'envoi d'email, on affiche l'OTP dans la console
         print("=" * 50)
@@ -279,13 +273,13 @@ def verify_vault_password(request, vault_slug):
             }, status=400)
             
     except Vault.DoesNotExist:
-        print(f"❌ Coffre non trouvé: {vault_slug}")
+        print(f"Coffre non trouvé: {vault_slug}")
         return JsonResponse({
             'success': False,
             'message': 'Coffre non trouvé.'
         }, status=404)
     except Exception as e:
-        print(f"❌ Erreur inattendue: {str(e)}")
+        print(f" Erreur inattendue: {str(e)}")
         return JsonResponse({
             'success': False,
             'message': 'Erreur lors de la vérification.'
@@ -794,8 +788,7 @@ def update_credential(request, credential_id):
             id=credential_id, 
             vault__user=request.user
         )
-        
-        # Mise à jour des champs
+
         credential.title = request.POST.get('title')
         credential.username = request.POST.get('username')
         credential.set_password(request.POST.get('password'))  # À implémenter
@@ -918,7 +911,7 @@ def credential_create(request):
     return render(request, 'passwords/credentials/credential_form_fields.html', {'form': form, 'title': 'Ajouter un identifiant'})
 
 
-# vue qui permet de dechifrer dechffrer un mot de passe de l'affciher
+# vue qui permet de dechifrer  un mot de passe de l'affciher
 @login_required
 def get_credential_password_api(request, slug):
     """
@@ -998,13 +991,7 @@ def credential_create(request):
 def credential_update(request, slug):
     """Vue pour modifier un credential existant"""
     credential = get_object_or_404(Credential, slug=slug, vault__user=request.user)
-    
-    print("\n" + "="*60)
-    print(" DÉBUT DE LA REQUÊTE DE MODIFICATION")
-    print(f" Credential: {credential.title} (ID: {credential.id})")
-    print(f"Méthode: {request.method}")
-    print(f" AJAX: {request.headers.get('X-Requested-With')}")
-    print("="*60 + "\n")
+
     
     if request.method == 'POST':
         # DEBUG: Afficher les données POST reçues
