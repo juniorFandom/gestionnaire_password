@@ -78,7 +78,9 @@ def register(request):
 # ---------- 3. Vue pour la connexion ----------
 def login_view(request):
     if request.session.get('is_connected'):
+        print("vous etes deja authentifier")
         return redirect('home')  
+    
     if request.method == "POST":
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -770,7 +772,7 @@ def get_credential(request, credential_id):
                 'id': credential.id,
                 'title': credential.title,
                 'username': credential.username,
-                'password': credential.get_decrypted_password(),  # À implémenter
+                'password': credential.get_decrypted_password(),  
                 'url': credential.url,
                 'notes': credential.notes,
             }

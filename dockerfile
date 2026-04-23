@@ -8,7 +8,7 @@ WORKDIR /app
 COPY  requirements.txt .   
 
 # install des dependance du projet
-RUN pip install -r requirements.txt   
+RUN pip install -r --no-cache-dir requirements.txt   
 
 # copie requirements.txt ne change pas, docker reutilise la couche pip precedente
 COPY . .        
@@ -19,7 +19,7 @@ RUN python manage.py migrate
 # Collecter les fichiers statiques pour servir les assets
 RUN python manage.py collectstatic --noinput
 
-#permet de peciser le port expose hors du conteneur
+#permet de peciser le port expose du conteneur
 EXPOSE 8000
 
 #represente le point d'entre du conteneur 

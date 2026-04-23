@@ -1,0 +1,9 @@
+version: 3.8
+  services:
+    web1:
+    build:.
+    volume: .:/app
+
+    bd:
+    images: postgrey-alpine
+    volume: data_base:

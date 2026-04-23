@@ -8,11 +8,6 @@ from .utils import derive_master_key
 
 
 
-
-# ==========================
-#   USER PERSONNALISÉ
-# ==========================
-
 class CustomUserManager(BaseUserManager):
 
     def create_user(self, email, password=None, **extra_fields):
@@ -59,7 +54,7 @@ class CustomUser(AbstractUser):
 
 
 
-## models du coffre (vault)
+# models du coffre (vault)
 
 class Vault(TimeStampedModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='users')
