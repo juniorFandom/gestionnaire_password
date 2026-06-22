@@ -28,9 +28,46 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.db import transaction
 from django.db.models import Count, Q
+import urllib.parse
+from django.shortcuts import redirect
+from django.conf import settings
 
 
+# fonction de connexion au serveur de google
+def google_login(request):
+    # On prépare les paramètres pour Google
+    params = {
+    "client_id": settings.GOOGLE_CLIENT_ID, # Public, obligatoire
+    "redirect_uri": settings.GOOGLE_REDIRECT_URI,
+    "response_type": "code", # On demande un Authorization Code
+    "scope": "openid email profile", # On utilise OIDC pour avoir l'identité
+    }
+    url = "https://accounts.google.com/o/oauth2/v2/auth?" + urllib.parse.urlencode(params)
+    return redirect('get_token')
 
+# fonction qui permet l'echange securisee entre le serveur google et notre serveur django
+def google_callback(request):
+    # 1. On récupère le code temporaire envoyé par Google dans l'URL
+    code = request.GET.get("code")
+    # 2. On prépare la requête de serveur à serveur pour récupérer les Tokens
+    token_url = "https://oauth2.googleapis.com/token"
+    data = {
+    "code": code,
+    "client_id": settings.GOOGLE_CLIENT_ID,
+    "client_secret": settings.GOOGLE_CLIENT_SECRET, # CRITIQUE : Preuve d'identité de Django
+    "redirect_uri": settings.GOOGLE_REDIRECT_URI,
+    "grant_type": "authorization_code",
+    }
+    # 3. Django envoie la requête à Google en "Back-channel" (invisible pour l'utilisateur)
+    response = request.post(token_url, data=data)
+    tokens = response.json()
+    # Google vérifie le code ET le Client Secret. Si c'est correct, il renvoie les jetons.
+    access_token = tokens.get("access_token")
+    id_token = tokens.get("id_token") # Le JWT contenant l'identité (OIDC)
+    # À ce stade, votre application Django a la preuve que l'utilisateur est authentifié.
+    # Vous pouvez lire l'ID Token, créer l'utilisateur dans la base Django et ouvrir la session.
+
+    return JsonResponse({"message": "Connexion réussie", "id_token_recu": id_token, "access_token": access_token})
 
 
 User = get_user_model()

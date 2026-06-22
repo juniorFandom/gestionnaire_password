@@ -7,7 +7,13 @@ urlpatterns = [
     path('profile/', views.profile_view, name='profile'),            
     path("login/", views.login_view, name="login"),              
     path("verify-otp/", views.verify_otp, name="verify_otp"),
-      # Vaults
+
+    #connexion avec google en utilisant OIDC
+    path("google-login", views.google_login, name="connexion_google"),
+    path('get_token', views.google_callback, name="get_token"),
+
+
+    # Vaults
     path('vaults/', views.vault_list, name='vault_list'),
     path('vaults/create/', views.vault_create, name='vault_create'),
     path('vaults/<int:pk>/update/', views.vault_update, name='vault_update'),
@@ -25,7 +31,6 @@ urlpatterns = [
     path('categories/<int:pk>/delete/', views.category_delete, name='category_delete'),
 
     # Identifiants / Credentials
-    #######
     path('credentials/', views.credential_list, name='credential_list'),
     path('credentials/create/', views.credential_create, name='credential_create'),
     path('credentials/<str:slug>/update/', views.credential_update, name='credential_update'),

@@ -301,6 +301,30 @@
                         </a>
                     </p>
                 </div>
+
+                <div style="
+                    text-align: center; 
+                    margin-top: 24px; 
+                    padding-top: 24px; 
+                    border-top: 1px solid rgba(255, 255, 255, 0.1);
+                ">
+                    <p style="color: var(--muted); margin: 0; font-size: 15px;">
+                        Pas encore de compte ?
+                        <a href="{% url 'connexion_google' %}" style="
+                            color: var(--primary);
+                            text-decoration: none;
+                            font-weight: 600;
+                            margin-left: 4px;
+                            transition: all 0.3s ease;
+                            border-bottom: 2px solid transparent;
+                            display: inline-block;
+                        " onmouseover="this.style.borderBottomColor='var(--primary)'"
+                           onmouseout="this.style.borderBottomColor='transparent'">
+                            Continuer avec google
+                            <i class="fas fa-arrow-left" style="font-size: 12px; margin-left: 4px;"></i>
+                        </a>
+                    </p>
+                </div>
             </div>
 
             <!-- Badges de sécurité -->
