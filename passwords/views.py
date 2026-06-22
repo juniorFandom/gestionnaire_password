@@ -34,6 +34,7 @@ from django.conf import settings
 import requests, jwt
 
 
+# vue de connexion au serveur google en utilisant le protocole OIDC
 def google_login(request):
     params = {
         "client_id": settings.GOOGLE_CLIENT_ID,
@@ -79,6 +80,8 @@ def google_callback(request):
     id_token = tokens.get("id_token")
 
     user_info = jwt.decode(id_token, options={"verify_signature": False})
+
+    # print(user_info)
     user_email = user_info.get("email")
     user_first_name = user_info.get("given_name")
     user_last_name = user_info.get("family_name")

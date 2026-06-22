@@ -8,13 +8,16 @@ WORKDIR /app
 COPY  requirements.txt .   
 
 # install des dependance du projet
-RUN pip install -r --no-cache-dir requirements.txt   
+RUN pip install -r --no-cache-dir --break-system-packages requirements.txt   
 
 # copie requirements.txt ne change pas, docker reutilise la couche pip precedente
 COPY . .        
 
 # Appliquer les migrations de base de données pour initialiser la DB
 RUN python manage.py migrate
+
+# Appliquer les migrations de base de données pour initialiser la DB
+RUN python manage.py makemigrations
 
 # Collecter les fichiers statiques pour servir les assets
 RUN python manage.py collectstatic --noinput

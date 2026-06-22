@@ -70,7 +70,7 @@ pip install -r requirements.txt
     http://127.0.0.1:8000 (et ajoute http://localhost:8000 par sécurité)
 
     - URI de redirection autorisés : C'est ici que vous déclarez votre fonction callback ! Cliquez sur "Ajouter une URL" et mettez l'exact chemin vers votre vue :
-    http://127.0.0.1:8000/get_token
+    http://127.0.0.1:8000/auth/callback/
 
     - Cliquez sur Créer.
  Étape 5 : Récupérer les clés

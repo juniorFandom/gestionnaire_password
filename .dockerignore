@@ -5,4 +5,4 @@
 .md
 .vscode
 /pycache
-
+/venv
