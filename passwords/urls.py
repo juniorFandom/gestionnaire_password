@@ -9,8 +9,8 @@ urlpatterns = [
     path("verify-otp/", views.verify_otp, name="verify_otp"),
 
     #connexion avec google en utilisant OIDC
-    path("google-login", views.google_login, name="connexion_google"),
-    path('get_token', views.google_callback, name="get_token"),
+    path("google-login/", views.google_login, name="connexion_google"),
+    path('auth/callback/', views.google_callback, name="get_token"),
 
 
     # Vaults

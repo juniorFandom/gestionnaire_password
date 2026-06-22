@@ -31,44 +31,68 @@ from django.db.models import Count, Q
 import urllib.parse
 from django.shortcuts import redirect
 from django.conf import settings
+import requests, jwt
 
 
-# fonction de connexion au serveur de google
 def google_login(request):
-    # On prépare les paramètres pour Google
     params = {
-    "client_id": settings.GOOGLE_CLIENT_ID, # Public, obligatoire
-    "redirect_uri": settings.GOOGLE_REDIRECT_URI,
-    "response_type": "code", # On demande un Authorization Code
-    "scope": "openid email profile", # On utilise OIDC pour avoir l'identité
+        "client_id": settings.GOOGLE_CLIENT_ID,
+        "redirect_uri": settings.GOOGLE_REDIRECT_URI,
+        "response_type": "code",
+        "scope": "openid email profile",
     }
     url = "https://accounts.google.com/o/oauth2/v2/auth?" + urllib.parse.urlencode(params)
-    return redirect('get_token')
+    return redirect(url) # Redirection chez Google !
 
-# fonction qui permet l'echange securisee entre le serveur google et notre serveur django
 def google_callback(request):
-    # 1. On récupère le code temporaire envoyé par Google dans l'URL
+    # 1. On récupère le code envoyé par Google
     code = request.GET.get("code")
-    # 2. On prépare la requête de serveur à serveur pour récupérer les Tokens
+    if not code:
+        return JsonResponse({
+            "status": "Erreur Django",
+            "message": "Django n'a trouvé aucun paramètre 'code' dans l'URL !",
+            "parametres_recus_dans_l_url": dict(request.GET)
+        }, status=400)
+        
+    # 2. Préparation de l'échange de serveur à serveur
     token_url = "https://oauth2.googleapis.com/token"
     data = {
-    "code": code,
-    "client_id": settings.GOOGLE_CLIENT_ID,
-    "client_secret": settings.GOOGLE_CLIENT_SECRET, # CRITIQUE : Preuve d'identité de Django
-    "redirect_uri": settings.GOOGLE_REDIRECT_URI,
-    "grant_type": "authorization_code",
+        "code": code,
+        "client_id": settings.GOOGLE_CLIENT_ID,
+        "client_secret": settings.GOOGLE_CLIENT_SECRET,
+        "redirect_uri": settings.GOOGLE_REDIRECT_URI,
+        "grant_type": "authorization_code",
     }
-    # 3. Django envoie la requête à Google en "Back-channel" (invisible pour l'utilisateur)
-    response = request.post(token_url, data=data)
+    
+    # 3. Envoi unique de la requête à Google
+    response = requests.post(token_url, data=data)
     tokens = response.json()
-    # Google vérifie le code ET le Client Secret. Si c'est correct, il renvoie les jetons.
+    
+    # 4. Vérification du résultat
+    if "error" in tokens or not tokens.get("access_token"):
+        return JsonResponse({
+            "status": "Erreur venant de Google",
+            "details_de_l_erreur": tokens
+        }, status=400)
+
     access_token = tokens.get("access_token")
-    id_token = tokens.get("id_token") # Le JWT contenant l'identité (OIDC)
-    # À ce stade, votre application Django a la preuve que l'utilisateur est authentifié.
-    # Vous pouvez lire l'ID Token, créer l'utilisateur dans la base Django et ouvrir la session.
+    id_token = tokens.get("id_token")
 
-    return JsonResponse({"message": "Connexion réussie", "id_token_recu": id_token, "access_token": access_token})
+    user_info = jwt.decode(id_token, options={"verify_signature": False})
+    user_email = user_info.get("email")
+    user_first_name = user_info.get("given_name")
+    user_last_name = user_info.get("family_name")
 
+    user, created = CustomUser.objects.get_or_create(
+        email=user_email,
+        defaults={
+            "first_name": user_first_name,
+            "last_name": user_last_name
+        }
+    )
+
+    auth_login(request, user)
+    return redirect('home')  
 
 User = get_user_model()
 

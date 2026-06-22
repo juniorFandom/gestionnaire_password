@@ -1,6 +1,6 @@
 # Projet gestionnaire de mot de pass 
 
-Application web de gestionnaire de mot de pass développée avec Django utilisant une application molothique.
+Application web de gestionnaire de mot de passe développée avec Django et la methode AES-GCM utilisant une architecture molothique.
 
 ## Prérequis
 
@@ -27,24 +27,79 @@ source .venv/bin/activate  # Linux/Mac
 ```bash
 pip install -r requirements.txt
 ```
+## configuration de OIDC
+4. Configurer le projet dans google console afin d'obtenir les paramettres (identifiants) pour inplementer le protocole OIDC
+     
+ Étape 1 : Aller sur la Console Google Cloud
 
-4. Configurer les variables d'environnement :
+    - Rendez-vous sur la Google Cloud Console.
+
+    - Connectez-vous avec votre compte Google.
+
+    - Si ce n'est pas déjà fait, créez un nouveau projet (cliquez sur la liste déroulante des projets en haut à gauche → Nouveau projet → Donnez-lui un nom comme "Gestionnaire Mots de Passe").
+
+ Étape 2 : Configurer l'écran de consentement OAuth (Obligatoire d'abord)
+
+    Avant de vous donner des clés, Google doit savoir à quoi va ressembler l'écran que verra votre utilisateur.
+
+    - Dans le menu de gauche, allez dans API et services → Écran de consentement OAuth.
+
+    - Choisissez le type Externe (ou Internal si vous utilisez un compte Google Workspace d'entreprise), puis cliquez sur Créer.
+
+    - Remplissez uniquement les champs obligatoires (Nom de l'application, adresse email d'assistance).
+
+    - Cliquez sur Enregistrer et continuer jusqu'au bout sans rien toucher d'autre.
+
+ Étape 3 : Créer les identifiants (ID Client et Secret)
+
+    C'est ici que l'on génère vos fameuses clés :
+
+    - Dans le menu de gauche, cliquez sur Identifiants.
+
+    - En haut, cliquez sur + Créer des identifiants → ID de client OAuth.
+
+    - Dans Type d'application, sélectionnez Application Web.
+
+    - Donnez-lui un nom (ex: "Django Local").
+
+ Étape 4 : Configurer les URLs (Le point le plus important )
+
+    Faites défiler la page vers le bas jusqu'aux sections d'URLs :
+
+    - Origines JavaScript autorisées : Cliquez sur "Ajouter une URL" et mettez l'adresse de base de votre Django :
+    http://127.0.0.1:8000 (et ajoute http://localhost:8000 par sécurité)
+
+    - URI de redirection autorisés : C'est ici que vous déclarez votre fonction callback ! Cliquez sur "Ajouter une URL" et mettez l'exact chemin vers votre vue :
+    http://127.0.0.1:8000/get_token
+
+    - Cliquez sur Créer.
+ Étape 5 : Récupérer les clés
+
+ Une fenêtre surgissante s'affiche avec :
+
+    - Votre ID de client (Une longue chaîne qui finit par .apps.googleusercontent.com)
+
+    - Votre Code secret du client (Une clé secrète).
+ Etape 6: copier les identifianta dans les variables d'environnement dans le fichier .env
+
+
+5. Configurer les variables d'environnement :
 ```bash
 cp .env.example .env
 # Modifier les valeurs dans .env selon vos besoins conculter le fichier .env.example pour la configuration du fichier .env
 ```
 
-5. Appliquer les migrations :
+6. Appliquer les migrations :
 ```bash
 python manage.py migrate
 ```
 
-6. Créer un superutilisateur :
+7. Créer un superutilisateur :
 ```bash
 python manage.py createsuperuser
 ```
 
-7. Lancer le serveur de développement :
+8. Lancer le serveur de développement :
 ```bash
 python manage.py runserver
 ```
