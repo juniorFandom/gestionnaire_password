@@ -1,6 +1,6 @@
 # Projet gestionnaire de mot de pass 
 
-Application web de gestionnaire de mot de passe développée avec Django et la methode AES-GCM utilisant une architecture molothique.
+**SecureVault** est une application web monolithique de gestion de coffre-fort numérique développée avec **Django** et orchestrée sous **Docker Compose**, conçue pour centraliser et sécuriser le stockage d'identifiants selon un modèle de confiance « *Zero-Knowledge* ». L'application délègue l'authentification initiale à la plateforme **Google Identity (OAuth 2.0 / OpenID Connect)** via une route de *Callback* sécurisée, éliminant ainsi la gestion locale de mots de passe d'accès tout en protégeant l'interface contre les failles XSS et CSRF grâce aux sécurités natives du framework django. L'accès aux secrets repose sur un principe de chiffrement d'enveloppe hautement sécurisé : à chaque connexion, le mot de passe maître de l'utilisateur est transformé en une clé de 256 bits par la fonction de dérivation **PBKDF2-HMAC-SHA256** (100 000 itérations avec sel unique), laquelle est immédiatement utilisée pour déchiffrer la clé interne du coffre-fort via l'algorithme symétrique authentifié **AES-256-GCM**. Ce couplage garantit non seulement une confidentialité absolue des données—qui restent mathématiquement illisibles en base de données même en cas de compromission du serveur—mais assure également leur intégrité stricte grâce à la validation par tag d'authenticité (AEAD), offrant ainsi une solution robuste, performante en mémoire et simple à déployer.
 
 ## Prérequis
 
