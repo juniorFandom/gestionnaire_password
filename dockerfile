@@ -22,7 +22,7 @@ RUN python manage.py makemigrations
 # Collecter les fichiers statiques pour servir les assets
 RUN python manage.py collectstatic --noinput
 
-#permet de peciser le port expose du conteneur
+#permet de preciser le port expose du conteneur
 EXPOSE 8000
 
 #represente le point d'entre du conteneur 
