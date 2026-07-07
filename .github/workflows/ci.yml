@@ -1,4 +1,5 @@
 name: Continuous Integration
+
 on:
   push:
     branches: [ main, master ]
@@ -8,16 +9,34 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v4  # Check out the repository (get the code)
+      - uses: actions/checkout@v4
+      
       - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
+          
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Run tests
+          
+      - name: Create .env file
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          DEBUG: False
         run: |
-          python manage.py test
+          echo "SECRET_KEY=$SECRET_KEY" > .env
+          echo "DEBUG=$DEBUG" >> .env
+          
+      - name: Run database migrations
+        run: |
+          python manage.py migrate
+          
+      - name: Run tests
+        env:
+          DJANGO_SETTINGS_MODULE: password_manager.settings
+        run: |
+          python manage.py test --verbosity=2
